@@ -15,7 +15,6 @@ dependencies:
     - go get golang.org/x/tools/cmd/cover
     - go get github.com/mattn/goveralls
     - go get github.com/modocache/gover
-    - go get github.com/stretchr/testify
 test:
   override:
     - cd ~/.go_workspace/src/github.com/zencoder/go-remote-config && make test
