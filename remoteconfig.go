@@ -32,7 +32,7 @@ func downloadJSONValidate(signedURL string, configStruct interface{}) error {
 
 	// Check that we got a valid response code
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Download of JSON failed, URL = %s Response Code = %d", signedURL, resp.StatusCode)
+		return fmt.Errorf("Download of JSON failed, URL = %s, Response Code = %d", signedURL, resp.StatusCode)
 	}
 
 	// Do a streaming JSON decode
