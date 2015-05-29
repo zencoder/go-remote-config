@@ -203,7 +203,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorDownloadFailed() {
 	c := &SampleConfig{}
 	err := downloadJSONValidate(ts.URL, c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrConfigFailedDownload, err)
+	assert.Equal(s.T(), errors.New("Download of JSON failed, Response Code = 404"), err)
 }
 
 func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorValidation() {
@@ -228,5 +228,5 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorInvalidJSON() {
 	err := downloadJSONValidate(ts.URL, c)
 
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Failed to decode config JSON"), err)
+	assert.Equal(s.T(), errors.New("Failed to decode JSON, with error, invalid character 'T' looking for beginning of value"), err)
 }

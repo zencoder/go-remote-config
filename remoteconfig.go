@@ -2,18 +2,12 @@ package remoteconfig
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
 )
 
 const DEFAULT_S3_EXPIRY uint = 60
-
-var (
-	ErrConfigFailedDownload = errors.New("Failed to download config JSON")
-	ErrConfigFailedDecode   = errors.New("Failed to decode config JSON")
-)
 
 // Downloads a configuration JSON file from S3.
 // Parses it to a particular struct type and runs a validation.
@@ -38,13 +32,13 @@ func downloadJSONValidate(signedURL string, configStruct interface{}) error {
 
 	// Check that we got a valid response code
 	if resp.StatusCode != http.StatusOK {
-		return ErrConfigFailedDownload
+		return fmt.Errorf("Download of JSON failed, Response Code = %d", resp.StatusCode)
 	}
 
 	// Do a streaming JSON decode
 	dec := json.NewDecoder(resp.Body)
 	if err = dec.Decode(configStruct); err != nil {
-		return ErrConfigFailedDecode
+		return fmt.Errorf("Failed to decode JSON, with error, %s", err.Error())
 	}
 
 	// Run validation on the config
