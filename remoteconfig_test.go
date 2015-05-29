@@ -203,7 +203,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorDownloadFailed() {
 	c := &SampleConfig{}
 	err := downloadJSONValidate(ts.URL, c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Download of JSON failed, Response Code = 404"), err)
+	assert.Equal(s.T(), fmt.Errorf("Download of JSON failed, URL = %s Response Code = %d", ts.URL, http.StatusNotFound), err)
 }
 
 func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorValidation() {
