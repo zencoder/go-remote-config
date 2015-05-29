@@ -1,6 +1,7 @@
 package remoteconfig
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -12,6 +13,7 @@ const (
 	VALID_SQS_REGION         AWSRegion = AWS_REGION_US_EAST_1
 	VALID_SQS_AWS_ACCOUNT_ID string    = "345833302425"
 	VALID_SQS_QUEUE_NAME     string    = "testQueue"
+	VALID_SQS_ENDPOINT       string    = "http://localhost/testsqs"
 )
 
 var (
@@ -43,7 +45,24 @@ func (s *SQSConfigSuite) TestValidate() {
 		QueueName:    &queueName,
 	}
 
-	err := c.Validate()
+	err := validateConfigWithReflection(c)
+	assert.Nil(s.T(), err)
+}
+
+func (s *SQSConfigSuite) TestValidateWithEndpoint() {
+	region := VALID_SQS_REGION
+	awsAccountID := VALID_SQS_AWS_ACCOUNT_ID
+	queueName := VALID_SQS_QUEUE_NAME
+	endpoint := VALID_SQS_ENDPOINT
+
+	c := &SQSConfig{
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
+		Endpoint:     &endpoint,
+	}
+
+	err := validateConfigWithReflection(c)
 	assert.Nil(s.T(), err)
 }
 
@@ -58,9 +77,9 @@ func (s *SQSConfigSuite) TestValidateErrorRegion() {
 		QueueName:    &queueName,
 	}
 
-	err := c.Validate()
+	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrSQSConfigInvalidRegion, err)
+	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
 func (s *SQSConfigSuite) TestValidateErrorAWSAccountID() {
@@ -74,9 +93,9 @@ func (s *SQSConfigSuite) TestValidateErrorAWSAccountID() {
 		QueueName:    &queueName,
 	}
 
-	err := c.Validate()
+	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrSQSConfigInvalidAWSAccountID, err)
+	assert.Equal(s.T(), errors.New("String Field: AWSAccountID, contains an empty string"), err)
 }
 
 func (s *SQSConfigSuite) TestValidateErrorQueueName() {
@@ -90,9 +109,9 @@ func (s *SQSConfigSuite) TestValidateErrorQueueName() {
 		QueueName:    &queueName,
 	}
 
-	err := c.Validate()
+	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrSQSConfigInvalidQueueName, err)
+	assert.Equal(s.T(), errors.New("String Field: QueueName, contains an empty string"), err)
 }
 
 func (s *SQSConfigSuite) TestGetURL() {
@@ -106,7 +125,23 @@ func (s *SQSConfigSuite) TestGetURL() {
 		QueueName:    &queueName,
 	}
 
-	url, err := c.GetURL()
-	assert.Nil(s.T(), err)
+	url := c.GetURL()
 	assert.Equal(s.T(), VALID_SQS_QUEUE_URL, url)
+}
+
+func (s *SQSConfigSuite) TestGetURLEndpoint() {
+	region := VALID_SQS_REGION
+	awsAccountID := VALID_SQS_AWS_ACCOUNT_ID
+	queueName := VALID_SQS_QUEUE_NAME
+	endpoint := VALID_SQS_ENDPOINT
+
+	c := &SQSConfig{
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
+		Endpoint:     &endpoint,
+	}
+
+	url := c.GetURL()
+	assert.Equal(s.T(), VALID_SQS_ENDPOINT, url)
 }

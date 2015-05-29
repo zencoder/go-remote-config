@@ -122,7 +122,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSConfigValida
 	}
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("SQSConfig Field: SQS, Failed to validate with error: Invalid SQS Region"), err)
+	assert.Equal(s.T(), errors.New("Sub Field of SQS, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBConfigNotSet() {
@@ -167,7 +167,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBConfigV
 
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("DynamoDBConfig Field: DynamoDB, Failed to validate with error: Invalid DynamoDB Region"), err)
+	assert.Equal(s.T(), errors.New("Sub Field of DynamoDB, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrNotSet() {
@@ -253,7 +253,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
 	defer ts.Close()
 
 	c := &SampleConfig{}
-	err := downloadJSONValidate(ts.URL, c)
+	err := DownloadJSONValidate(ts.URL, c)
 	assert.Nil(s.T(), err)
 }
 
@@ -264,7 +264,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorDownloadFailed() {
 	defer ts.Close()
 
 	c := &SampleConfig{}
-	err := downloadJSONValidate(ts.URL, c)
+	err := DownloadJSONValidate(ts.URL, c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), fmt.Errorf("Download of JSON failed, URL = %s, Response Code = %d", ts.URL, http.StatusNotFound), err)
 }
@@ -276,7 +276,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorValidation() {
 	defer ts.Close()
 
 	c := &SampleConfig{}
-	err := downloadJSONValidate(ts.URL, c)
+	err := DownloadJSONValidate(ts.URL, c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Field: SQS, not set"), err)
 }
@@ -288,7 +288,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorInvalidJSON() {
 	defer ts.Close()
 
 	c := &SampleConfig{}
-	err := downloadJSONValidate(ts.URL, c)
+	err := DownloadJSONValidate(ts.URL, c)
 
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Failed to decode JSON, with error, invalid character 'T' looking for beginning of value"), err)

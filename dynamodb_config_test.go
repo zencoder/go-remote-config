@@ -1,6 +1,7 @@
 package remoteconfig
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -35,7 +36,7 @@ func (s *DynamoDBConfigSuite) TestValidate() {
 		TableName: &tableName,
 	}
 
-	err := d.Validate()
+	err := validateConfigWithReflection(d)
 	assert.Nil(s.T(), err)
 }
 
@@ -48,9 +49,9 @@ func (s *DynamoDBConfigSuite) TestValidateErrorRegion() {
 		TableName: &tableName,
 	}
 
-	err := d.Validate()
+	err := validateConfigWithReflection(d)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrDynamoDBConfigInvalidRegion, err)
+	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error, Region cannot be empty"), err)
 }
 
 func (s *DynamoDBConfigSuite) TestValidateErrorTableName() {
@@ -62,9 +63,9 @@ func (s *DynamoDBConfigSuite) TestValidateErrorTableName() {
 		TableName: &tableName,
 	}
 
-	err := d.Validate()
+	err := validateConfigWithReflection(d)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrDynamoDBConfigInvalidTableName, err)
+	assert.Equal(s.T(), errors.New("String Field: TableName, contains an empty string"), err)
 }
 
 func (s *DynamoDBConfigSuite) TestGetRegion() {

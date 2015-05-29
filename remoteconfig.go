@@ -10,6 +10,10 @@ import (
 
 const DEFAULT_S3_EXPIRY uint = 60
 
+type Validater interface {
+	Validate() error
+}
+
 // Downloads a configuration JSON file from S3.
 // Parses it to a particular struct type and runs a validation.
 // URL should be of the format s3://bucket/path/file.json
@@ -20,10 +24,11 @@ func LoadConfigFromS3(configURL string, configRegion AWSRegion, configStruct int
 		return err
 	}
 
-	return downloadJSONValidate(signedURL, configStruct)
+	return DownloadJSONValidate(signedURL, configStruct)
 }
 
-func downloadJSONValidate(signedURL string, configStruct interface{}) error {
+// Downloads JSON from a URL, decodes it and then validates.
+func DownloadJSONValidate(signedURL string, configStruct interface{}) error {
 	// Download the config file from S3
 	resp, err := http.Get(signedURL)
 	if err != nil {
@@ -57,6 +62,9 @@ func validateConfigWithReflection(c interface{}) error {
 	valueElem := reflect.ValueOf(c).Elem()
 	typeElem := reflect.TypeOf(c).Elem()
 
+	// Gets a refection Type value for the Validater interface
+	validaterType := reflect.TypeOf((*Validater)(nil)).Elem()
+
 	for i := 0; i < valueElem.NumField(); i++ {
 		valueField := valueElem.Field(i)
 		typeField := typeElem.Field(i)
@@ -70,21 +78,26 @@ func validateConfigWithReflection(c interface{}) error {
 			continue
 		}
 
-		switch valueField.Interface().(type) {
-		case *SQSConfig:
-			sqs := valueField.Interface().(*SQSConfig)
-			if err := sqs.Validate(); err != nil {
-				return fmt.Errorf("SQSConfig Field: %s, Failed to validate with error: %s", typeField.Name, err.Error())
-			}
-		case *DynamoDBConfig:
-			dynamodb := valueField.Interface().(*DynamoDBConfig)
-			if err := dynamodb.Validate(); err != nil {
-				return fmt.Errorf("DynamoDBConfig Field: %s, Failed to validate with error: %s", typeField.Name, err.Error())
-			}
-		case *string:
-			s := valueField.Interface().(*string)
+		// If this is a string field, check that it isn't empty (unless optional)
+		if s, ok := valueField.Interface().(*string); ok {
 			if *s == "" && !optional {
 				return fmt.Errorf("String Field: %s, contains an empty string", typeField.Name)
+			}
+			continue
+		}
+
+		// If the Validater interface is implemented, call the Validate method
+		if typeField.Type.Implements(validaterType) {
+			if err := valueField.Interface().(Validater).Validate(); err != nil {
+				return fmt.Errorf("Validater Field: %s, failed to validate with error, %s", typeField.Name, err)
+			}
+			continue
+		}
+
+		// If this field is a struct type, validate it with reflection
+		if valueField.Elem().NumField() > 0 {
+			if err := validateConfigWithReflection(valueField.Interface()); err != nil {
+				return fmt.Errorf("Sub Field of %s, failed to validate with error, %s", typeField.Name, err)
 			}
 		}
 	}
