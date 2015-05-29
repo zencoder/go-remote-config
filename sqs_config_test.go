@@ -38,9 +38,9 @@ func (s *SQSConfigSuite) TestValidate() {
 	queueName := VALID_SQS_QUEUE_NAME
 
 	c := &SQSConfig{
-		region:       &region,
-		awsAccountID: &awsAccountID,
-		queueName:    &queueName,
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
 	}
 
 	err := c.Validate()
@@ -53,9 +53,9 @@ func (s *SQSConfigSuite) TestValidateErrorRegion() {
 	queueName := VALID_SQS_QUEUE_NAME
 
 	c := &SQSConfig{
-		region:       &region,
-		awsAccountID: &awsAccountID,
-		queueName:    &queueName,
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
 	}
 
 	err := c.Validate()
@@ -69,9 +69,9 @@ func (s *SQSConfigSuite) TestValidateErrorAWSAccountID() {
 	queueName := VALID_SQS_QUEUE_NAME
 
 	c := &SQSConfig{
-		region:       &region,
-		awsAccountID: &awsAccountID,
-		queueName:    &queueName,
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
 	}
 
 	err := c.Validate()
@@ -85,9 +85,9 @@ func (s *SQSConfigSuite) TestValidateErrorQueueName() {
 	queueName := ""
 
 	c := &SQSConfig{
-		region:       &region,
-		awsAccountID: &awsAccountID,
-		queueName:    &queueName,
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
 	}
 
 	err := c.Validate()
@@ -95,19 +95,18 @@ func (s *SQSConfigSuite) TestValidateErrorQueueName() {
 	assert.Equal(s.T(), ErrSQSConfigInvalidQueueName, err)
 }
 
-func (s *SQSConfigSuite) TestURL() {
+func (s *SQSConfigSuite) TestGetURL() {
 	region := VALID_SQS_REGION
 	awsAccountID := VALID_SQS_AWS_ACCOUNT_ID
 	queueName := VALID_SQS_QUEUE_NAME
 
 	c := &SQSConfig{
-		region:       &region,
-		awsAccountID: &awsAccountID,
-		queueName:    &queueName,
+		Region:       &region,
+		AWSAccountID: &awsAccountID,
+		QueueName:    &queueName,
 	}
 
-	url, err := c.URL()
+	url, err := c.GetURL()
 	assert.Nil(s.T(), err)
 	assert.Equal(s.T(), VALID_SQS_QUEUE_URL, url)
-
 }

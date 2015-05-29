@@ -3,8 +3,8 @@ package remoteconfig
 import "errors"
 
 type DynamoDBConfig struct {
-	region    *AWSRegion `json:"region,omitempty"`
-	tableName *string    `json:"table_name,omitempty"`
+	Region    *AWSRegion `json:"region,omitempty"`
+	TableName *string    `json:"table_name,omitempty"`
 }
 
 var (
@@ -14,19 +14,19 @@ var (
 
 // Validates that all the member fields are valid.
 func (d DynamoDBConfig) Validate() error {
-	if d.region == nil || d.region.Validate() != nil {
+	if d.Region == nil || d.Region.Validate() != nil {
 		return ErrDynamoDBConfigInvalidRegion
 	}
-	if d.tableName == nil || *d.tableName == "" {
+	if d.TableName == nil || *d.TableName == "" {
 		return ErrDynamoDBConfigInvalidTableName
 	}
 	return nil
 }
 
-func (d DynamoDBConfig) Region() AWSRegion {
-	return *d.region
+func (d DynamoDBConfig) GetRegion() AWSRegion {
+	return *d.Region
 }
 
-func (d DynamoDBConfig) TableName() string {
-	return *d.tableName
+func (d DynamoDBConfig) GetTableName() string {
+	return *d.TableName
 }

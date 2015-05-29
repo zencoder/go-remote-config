@@ -6,9 +6,9 @@ import (
 )
 
 type SQSConfig struct {
-	region       *AWSRegion `json:"region,omitempty"`
-	awsAccountID *string    `json:"aws_account_id,omitempty"`
-	queueName    *string    `json:"queue_name,omitempty"`
+	Region       *AWSRegion `json:"region,omitempty"`
+	AWSAccountID *string    `json:"aws_account_id,omitempty"`
+	QueueName    *string    `json:"queue_name,omitempty"`
 }
 
 var (
@@ -19,20 +19,20 @@ var (
 
 // Validates that all the member fields are valid.
 func (s SQSConfig) Validate() error {
-	if s.region == nil || s.region.Validate() != nil {
+	if s.Region == nil || s.Region.Validate() != nil {
 		return ErrSQSConfigInvalidRegion
 	}
-	if s.awsAccountID == nil || *s.awsAccountID == "" {
+	if s.AWSAccountID == nil || *s.AWSAccountID == "" {
 		return ErrSQSConfigInvalidAWSAccountID
 	}
-	if s.queueName == nil || *s.queueName == "" {
+	if s.QueueName == nil || *s.QueueName == "" {
 		return ErrSQSConfigInvalidQueueName
 	}
 	return nil
 }
 
 // Returns a full SQS queue URL.
-func (s SQSConfig) URL() (string, error) {
-	url := fmt.Sprintf("https://sqs.%s.amazonaws.com/%s/%s", *s.region, *s.awsAccountID, *s.queueName)
+func (s SQSConfig) GetURL() (string, error) {
+	url := fmt.Sprintf("https://sqs.%s.amazonaws.com/%s/%s", *s.Region, *s.AWSAccountID, *s.QueueName)
 	return url, nil
 }

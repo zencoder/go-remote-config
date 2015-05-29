@@ -25,6 +25,10 @@ func LoadConfigFromS3(configURL string, configRegion AWSRegion, configStruct int
 		return err
 	}
 
+	return downloadJSONValidate(signedURL, configStruct)
+}
+
+func downloadJSONValidate(signedURL string, configStruct interface{}) error {
 	// Download the config file from S3
 	resp, err := http.Get(signedURL)
 	if err != nil {
@@ -61,6 +65,7 @@ func validateConfigWithReflection(c interface{}) error {
 	for i := 0; i < valueElem.NumField(); i++ {
 		valueField := valueElem.Field(i)
 		typeField := typeElem.Field(i)
+
 		switch valueField.Interface().(type) {
 		case *SQSConfig:
 			sqs := valueField.Interface().(*SQSConfig)

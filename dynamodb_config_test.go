@@ -31,8 +31,8 @@ func (s *DynamoDBConfigSuite) TestValidate() {
 	tableName := VALID_DYNAMODB_TABLE_NAME
 
 	d := &DynamoDBConfig{
-		region:    &region,
-		tableName: &tableName,
+		Region:    &region,
+		TableName: &tableName,
 	}
 
 	err := d.Validate()
@@ -44,8 +44,8 @@ func (s *DynamoDBConfigSuite) TestValidateErrorRegion() {
 	tableName := VALID_DYNAMODB_TABLE_NAME
 
 	d := &DynamoDBConfig{
-		region:    &region,
-		tableName: &tableName,
+		Region:    &region,
+		TableName: &tableName,
 	}
 
 	err := d.Validate()
@@ -58,8 +58,8 @@ func (s *DynamoDBConfigSuite) TestValidateErrorTableName() {
 	tableName := ""
 
 	d := &DynamoDBConfig{
-		region:    &region,
-		tableName: &tableName,
+		Region:    &region,
+		TableName: &tableName,
 	}
 
 	err := d.Validate()
@@ -67,26 +67,26 @@ func (s *DynamoDBConfigSuite) TestValidateErrorTableName() {
 	assert.Equal(s.T(), ErrDynamoDBConfigInvalidTableName, err)
 }
 
-func (s *DynamoDBConfigSuite) TestRegion() {
+func (s *DynamoDBConfigSuite) TestGetRegion() {
 	region := VALID_DYNAMODB_REGION
 	tableName := VALID_DYNAMODB_TABLE_NAME
 
 	d := &DynamoDBConfig{
-		region:    &region,
-		tableName: &tableName,
+		Region:    &region,
+		TableName: &tableName,
 	}
 
-	assert.Equal(s.T(), VALID_DYNAMODB_REGION, d.Region())
+	assert.Equal(s.T(), VALID_DYNAMODB_REGION, d.GetRegion())
 }
 
-func (s *DynamoDBConfigSuite) TestTableName() {
+func (s *DynamoDBConfigSuite) TestGetTableName() {
 	region := VALID_DYNAMODB_REGION
 	tableName := VALID_DYNAMODB_TABLE_NAME
 
 	d := &DynamoDBConfig{
-		region:    &region,
-		tableName: &tableName,
+		Region:    &region,
+		TableName: &tableName,
 	}
 
-	assert.Equal(s.T(), VALID_DYNAMODB_TABLE_NAME, d.TableName())
+	assert.Equal(s.T(), VALID_DYNAMODB_TABLE_NAME, d.GetTableName())
 }

@@ -2,6 +2,9 @@ package remoteconfig
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,16 +44,16 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflection() {
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
 	sqs := &SQSConfig{
-		region:       &sqsRegion,
-		awsAccountID: &sqsAWSAccountID,
-		queueName:    &sqsQueueName,
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
 	}
 
 	dynamodbRegion := VALID_REMOTE_CONFIG_DYNAMODB_REGION
 	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
 	dynamodb := &DynamoDBConfig{
-		region:    &dynamodbRegion,
-		tableName: &dynamodbTableName,
+		Region:    &dynamodbRegion,
+		TableName: &dynamodbTableName,
 	}
 
 	str := "testString"
@@ -77,7 +80,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSConfigNotSet
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSConfigValidate() {
 	sqsRegion := AWSRegion("invalidregion")
 	sqs := &SQSConfig{
-		region: &sqsRegion,
+		Region: &sqsRegion,
 	}
 	c := &SampleConfig{
 		SQS: sqs,
@@ -92,9 +95,9 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBConfigN
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
 	sqs := &SQSConfig{
-		region:       &sqsRegion,
-		awsAccountID: &sqsAWSAccountID,
-		queueName:    &sqsQueueName,
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
 	}
 
 	c := &SampleConfig{
@@ -112,14 +115,14 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBConfigV
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
 	sqs := &SQSConfig{
-		region:       &sqsRegion,
-		awsAccountID: &sqsAWSAccountID,
-		queueName:    &sqsQueueName,
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
 	}
 
 	dynamodbRegion := AWSRegion("invalidregion")
 	dynamodb := &DynamoDBConfig{
-		region: &dynamodbRegion,
+		Region: &dynamodbRegion,
 	}
 
 	c := &SampleConfig{
@@ -137,16 +140,16 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
 	sqs := &SQSConfig{
-		region:       &sqsRegion,
-		awsAccountID: &sqsAWSAccountID,
-		queueName:    &sqsQueueName,
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
 	}
 
 	dynamodbRegion := VALID_REMOTE_CONFIG_DYNAMODB_REGION
 	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
 	dynamodb := &DynamoDBConfig{
-		region:    &dynamodbRegion,
-		tableName: &dynamodbTableName,
+		Region:    &dynamodbRegion,
+		TableName: &dynamodbTableName,
 	}
 
 	str := ""
@@ -160,4 +163,70 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Empty String, Str"), err)
+}
+
+func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
+	c := &SQSConfig{}
+	err := LoadConfigFromS3("invalid", AWSRegion("invalid"), c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("S3 URL does not start with the s3:// scheme"), err)
+}
+
+func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{
+      "sqs" : {
+        "region" : "us-east-1",
+        "aws_account_id" : "345833302425",
+        "queue_name" : "testQueue"
+      },
+      "dynamodb" : {
+        "region" : "us-east-1",
+        "table_name" : "testTable"
+      },
+      "str" : "testStr"
+    }`)
+	}))
+	defer ts.Close()
+
+	c := &SampleConfig{}
+	err := downloadJSONValidate(ts.URL, c)
+	assert.Nil(s.T(), err)
+}
+
+func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorDownloadFailed() {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "JSON Download Failed", http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	c := &SampleConfig{}
+	err := downloadJSONValidate(ts.URL, c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), ErrConfigFailedDownload, err)
+}
+
+func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorValidation() {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	c := &SampleConfig{}
+	err := downloadJSONValidate(ts.URL, c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("SQS Config Not Set, SQS"), err)
+}
+
+func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorInvalidJSON() {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "This is NOT JSON")
+	}))
+	defer ts.Close()
+
+	c := &SampleConfig{}
+	err := downloadJSONValidate(ts.URL, c)
+
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Failed to decode config JSON"), err)
 }
