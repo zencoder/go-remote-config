@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"strings"
 )
 
 const DEFAULT_S3_EXPIRY uint = 60
@@ -60,27 +61,30 @@ func validateConfigWithReflection(c interface{}) error {
 		valueField := valueElem.Field(i)
 		typeField := typeElem.Field(i)
 
+		tags := typeField.Tag.Get("remoteconfig")
+		optional := strings.Contains(tags, "optional")
+
+		if valueField.IsNil() && !optional {
+			return fmt.Errorf("Field: %s, not set", typeField.Name)
+		} else if valueField.IsNil() && optional {
+			continue
+		}
+
 		switch valueField.Interface().(type) {
 		case *SQSConfig:
 			sqs := valueField.Interface().(*SQSConfig)
-			if sqs == nil {
-				return fmt.Errorf("SQS Config Not Set, %s", typeField.Name)
-			}
 			if err := sqs.Validate(); err != nil {
-				return fmt.Errorf("Failed to Validate SQSConfig, %s with error: %s", typeField.Name, err.Error())
+				return fmt.Errorf("SQSConfig Field: %s, Failed to validate with error: %s", typeField.Name, err.Error())
 			}
 		case *DynamoDBConfig:
 			dynamodb := valueField.Interface().(*DynamoDBConfig)
-			if dynamodb == nil {
-				return fmt.Errorf("DynamoDB Config Not Set, %s", typeField.Name)
-			}
 			if err := dynamodb.Validate(); err != nil {
-				return fmt.Errorf("Failed to Validate DynamoDBConfig, %s with error: %s", typeField.Name, err.Error())
+				return fmt.Errorf("DynamoDBConfig Field: %s, Failed to validate with error: %s", typeField.Name, err.Error())
 			}
 		case *string:
 			s := valueField.Interface().(*string)
-			if s == nil || *s == "" {
-				return fmt.Errorf("Empty String, %s", typeField.Name)
+			if *s == "" && !optional {
+				return fmt.Errorf("String Field: %s, contains an empty string", typeField.Name)
 			}
 		}
 	}
