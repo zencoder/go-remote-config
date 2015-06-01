@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	VALID_DYNAMODB_CLIENT_REGION   AWSRegion = AWS_REGION_US_EAST_1
-	VALID_DYNAMODB_CLIENT_ENDPOINT string    = "http://localhost:8000/dynamodb"
+	VALID_DYNAMODB_CLIENT_REGION      AWSRegion = AWS_REGION_US_EAST_1
+	VALID_DYNAMODB_CLIENT_ENDPOINT    string    = "http://localhost:8000/dynamodb"
+	VALID_DYNAMODB_CLIENT_DISABLE_SSL bool      = true
 )
 
 type DynamoDBClientConfigSuite struct {
@@ -85,4 +86,54 @@ func (s *DynamoDBClientConfigSuite) TestGetRegion() {
 	}
 
 	assert.Equal(s.T(), VALID_DYNAMODB_CLIENT_REGION, d.GetRegion())
+}
+
+func (s *DynamoDBClientConfigSuite) TestGetEndpoint() {
+	region := VALID_DYNAMODB_CLIENT_REGION
+	endpoint := VALID_DYNAMODB_CLIENT_ENDPOINT
+
+	d := &DynamoDBClientConfig{
+		Region:   &region,
+		Endpoint: &endpoint,
+	}
+
+	assert.Equal(s.T(), VALID_DYNAMODB_CLIENT_ENDPOINT, d.GetEndpoint())
+}
+
+func (s *DynamoDBClientConfigSuite) TestGetEndpointNotSet() {
+	region := VALID_DYNAMODB_CLIENT_REGION
+
+	d := &DynamoDBClientConfig{
+		Region:   &region,
+		Endpoint: nil,
+	}
+
+	assert.Equal(s.T(), "", d.GetEndpoint())
+}
+
+func (s *DynamoDBClientConfigSuite) TestGetDisableSSL() {
+	region := VALID_DYNAMODB_CLIENT_REGION
+	endpoint := VALID_DYNAMODB_CLIENT_ENDPOINT
+	disableSSL := VALID_DYNAMODB_CLIENT_DISABLE_SSL
+
+	d := &DynamoDBClientConfig{
+		Region:     &region,
+		Endpoint:   &endpoint,
+		DisableSSL: &disableSSL,
+	}
+
+	assert.Equal(s.T(), VALID_DYNAMODB_CLIENT_DISABLE_SSL, d.GetDisableSSL())
+}
+
+func (s *DynamoDBClientConfigSuite) TestGetDisableSSLNotSet() {
+	region := VALID_DYNAMODB_CLIENT_REGION
+	endpoint := VALID_DYNAMODB_CLIENT_ENDPOINT
+
+	d := &DynamoDBClientConfig{
+		Region:     &region,
+		Endpoint:   &endpoint,
+		DisableSSL: nil,
+	}
+
+	assert.Equal(s.T(), false, d.GetDisableSSL())
 }
