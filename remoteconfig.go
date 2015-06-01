@@ -95,7 +95,8 @@ func validateConfigWithReflection(c interface{}) error {
 		}
 
 		// If this field is a struct type, validate it with reflection
-		if valueField.Elem().NumField() > 0 {
+		// We can/should only check the sub-fields of a Struct
+		if valueField.Elem().Kind() == reflect.Struct && valueField.Elem().NumField() > 0 {
 			if err := validateConfigWithReflection(valueField.Interface()); err != nil {
 				return fmt.Errorf("Sub Field of %s, failed to validate with error, %s", typeField.Name, err)
 			}
