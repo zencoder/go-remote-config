@@ -80,7 +80,7 @@ func validateConfigWithReflection(c interface{}) error {
 
 		// If this is a string field, check that it isn't empty (unless optional)
 		if s, ok := valueField.Interface().(*string); ok {
-			if *s == "" && !optional {
+			if *s == "" {
 				return fmt.Errorf("String Field: %s, contains an empty string", typeField.Name)
 			}
 			continue

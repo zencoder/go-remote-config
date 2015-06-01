@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	VALID_REMOTE_CONFIG_SQS_REGION          AWSRegion = AWS_REGION_US_EAST_1
-	VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID  string    = "345833302425"
-	VALID_REMOTE_CONFIG_SQS_QUEUE_NAME      string    = "testQueue"
-	VALID_REMOTE_CONFIG_DYNAMODB_REGION     AWSRegion = AWS_REGION_US_EAST_1
-	VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME string    = "testTable"
+	VALID_REMOTE_CONFIG_SQS_REGION             AWSRegion = AWS_REGION_US_EAST_1
+	VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID     string    = "345833302425"
+	VALID_REMOTE_CONFIG_SQS_QUEUE_NAME         string    = "testQueue"
+	VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION AWSRegion = AWS_REGION_US_EAST_1
+	VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME    string    = "testTable"
 )
 
 type RemoteConfigSuite struct {
@@ -28,12 +28,16 @@ func TestRemoteConfigSuite(t *testing.T) {
 }
 
 type SampleConfig struct {
-	SQSOptional      *SQSConfig      `json:"sqs_optional,omitempty" remoteconfig:"optional"`
-	DynamoDBOptional *DynamoDBConfig `json:"dynamodb_optional,omitempty" remoteconfig:"optional"`
-	StrOptional      *string         `json:"str_optional,omitempty" remoteconfig:"optional"`
-	SQS              *SQSConfig      `json:"sqs,omitempty"`
-	DynamoDB         *DynamoDBConfig `json:"dynamodb,omitempty"`
-	Str              *string         `json:"str,omitempty"`
+	SQSQueueOptional       *SQSQueueConfig       `json:"sqs_queue_optional,omitempty" remoteconfig:"optional"`
+	SQSClientOptional      *SQSClientConfig      `json:"sqs_client_optional,omitempty" remoteconfig:"optional"`
+	DynamoDBTableOptional  *DynamoDBTableConfig  `json:"dynamodb_table_optional,omitempty" remoteconfig:"optional"`
+	DynamoDBClientOptional *DynamoDBClientConfig `json:"dynamodb_client_optional,omitempty" remoteconfig:"optional"`
+	StrOptional            *string               `json:"str_optional,omitempty" remoteconfig:"optional"`
+	SQSQueue               *SQSQueueConfig       `json:"sqs_queue,omitempty"`
+	SQSClient              *SQSClientConfig      `json:"sqs_client,omitempty"`
+	DynamoDBTable          *DynamoDBTableConfig  `json:"dynamodb_table,omitempty"`
+	DynamoDBClient         *DynamoDBClientConfig `json:"dynamodb_client,omitempty"`
+	Str                    *string               `json:"str,omitempty"`
 }
 
 func (s *RemoteConfigSuite) SetupSuite() {
@@ -46,25 +50,33 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflection() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region:       &sqsRegion,
 		AWSAccountID: &sqsAWSAccountID,
 		QueueName:    &sqsQueueName,
 	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
 
-	dynamodbRegion := VALID_REMOTE_CONFIG_DYNAMODB_REGION
 	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
-	dynamodb := &DynamoDBConfig{
-		Region:    &dynamodbRegion,
+	dynamodbTable := &DynamoDBTableConfig{
 		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
 	}
 
 	str := "testString"
 
 	c := &SampleConfig{
-		SQS:      sqs,
-		DynamoDB: dynamodb,
-		Str:      &str,
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: dynamodbClient,
+		Str:            &str,
 	}
 
 	err := validateConfigWithReflection(c)
@@ -75,122 +87,231 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionWithOptional() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region:       &sqsRegion,
 		AWSAccountID: &sqsAWSAccountID,
 		QueueName:    &sqsQueueName,
 	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
 
-	dynamodbRegion := VALID_REMOTE_CONFIG_DYNAMODB_REGION
 	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
-	dynamodb := &DynamoDBConfig{
-		Region:    &dynamodbRegion,
+	dynamodbTable := &DynamoDBTableConfig{
 		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
 	}
 
 	str := "testString"
 
 	c := &SampleConfig{
-		SQSOptional:      sqs,
-		DynamoDBOptional: dynamodb,
-		StrOptional:      &str,
-		SQS:              sqs,
-		DynamoDB:         dynamodb,
-		Str:              &str,
+		SQSQueueOptional:       sqsQueue,
+		SQSClientOptional:      sqsClient,
+		DynamoDBTableOptional:  dynamodbTable,
+		DynamoDBClientOptional: dynamodbClient,
+		StrOptional:            &str,
+		SQSQueue:               sqsQueue,
+		SQSClient:              sqsClient,
+		DynamoDBTable:          dynamodbTable,
+		DynamoDBClient:         dynamodbClient,
+		Str:                    &str,
 	}
 
 	err := validateConfigWithReflection(c)
 	assert.Nil(s.T(), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSConfigNotSet() {
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSQueueConfigNotSet() {
 	c := &SampleConfig{
-		SQS: nil,
+		SQSQueue: nil,
 	}
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Field: SQS, not set"), err)
+	assert.Equal(s.T(), errors.New("Field: SQSQueue, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSConfigValidate() {
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSClientConfigNotSet() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	c := &SampleConfig{
+		SQSQueue:  sqsQueue,
+		SQSClient: nil,
+	}
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Field: SQSClient, not set"), err)
+}
+
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSQueueConfigValidate() {
 	sqsRegion := AWSRegion("invalidregion")
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region: &sqsRegion,
 	}
 	c := &SampleConfig{
-		SQS: sqs,
+		SQSQueue: sqsQueue,
 	}
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Sub Field of SQS, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
+	assert.Equal(s.T(), errors.New("Sub Field of SQSQueue, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBConfigNotSet() {
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBTableConfigNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region:       &sqsRegion,
 		AWSAccountID: &sqsAWSAccountID,
 		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
 	}
 
 	c := &SampleConfig{
-		SQS:      sqs,
-		DynamoDB: nil,
+		SQSQueue:      sqsQueue,
+		SQSClient:     sqsClient,
+		DynamoDBTable: nil,
 	}
 
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Field: DynamoDB, not set"), err)
+	assert.Equal(s.T(), errors.New("Field: DynamoDBTable, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBConfigValidate() {
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBClientConfigNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region:       &sqsRegion,
 		AWSAccountID: &sqsAWSAccountID,
 		QueueName:    &sqsQueueName,
 	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	c := &SampleConfig{
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: nil,
+	}
+
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Field: DynamoDBClient, not set"), err)
+}
+
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBClientConfigValidate() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
 
 	dynamodbRegion := AWSRegion("invalidregion")
-	dynamodb := &DynamoDBConfig{
+	dynamodbClient := &DynamoDBClientConfig{
 		Region: &dynamodbRegion,
 	}
 
 	c := &SampleConfig{
-		SQS:      sqs,
-		DynamoDB: dynamodb,
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: dynamodbClient,
 	}
 
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Sub Field of DynamoDB, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
+	assert.Equal(s.T(), errors.New("Sub Field of DynamoDBClient, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
+}
+
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBTableConfigValidate() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := ""
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	c := &SampleConfig{
+		SQSQueue:      sqsQueue,
+		SQSClient:     sqsClient,
+		DynamoDBTable: dynamodbTable,
+	}
+
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Sub Field of DynamoDBTable, failed to validate with error, String Field: TableName, contains an empty string"), err)
 }
 
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region:       &sqsRegion,
 		AWSAccountID: &sqsAWSAccountID,
 		QueueName:    &sqsQueueName,
 	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
 
-	dynamodbRegion := VALID_REMOTE_CONFIG_DYNAMODB_REGION
 	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
-	dynamodb := &DynamoDBConfig{
-		Region:    &dynamodbRegion,
+	dynamodbTable := &DynamoDBTableConfig{
 		TableName: &dynamodbTableName,
 	}
 
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
+	}
+
 	c := &SampleConfig{
-		SQS:      sqs,
-		DynamoDB: dynamodb,
-		Str:      nil,
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: dynamodbClient,
+		Str:            nil,
 	}
 
 	err := validateConfigWithReflection(c)
@@ -202,25 +323,33 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqs := &SQSConfig{
+	sqsQueue := &SQSQueueConfig{
 		Region:       &sqsRegion,
 		AWSAccountID: &sqsAWSAccountID,
 		QueueName:    &sqsQueueName,
 	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
 
-	dynamodbRegion := VALID_REMOTE_CONFIG_DYNAMODB_REGION
 	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
-	dynamodb := &DynamoDBConfig{
-		Region:    &dynamodbRegion,
+	dynamodbTable := &DynamoDBTableConfig{
 		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
 	}
 
 	str := ""
 
 	c := &SampleConfig{
-		SQS:      sqs,
-		DynamoDB: dynamodb,
-		Str:      &str,
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: dynamodbClient,
+		Str:            &str,
 	}
 
 	err := validateConfigWithReflection(c)
@@ -229,7 +358,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 }
 
 func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
-	c := &SQSConfig{}
+	c := &SQSQueueConfig{}
 	err := LoadConfigFromS3("invalid", AWSRegion("invalid"), c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("S3 URL does not start with the s3:// scheme"), err)
@@ -238,13 +367,20 @@ func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
 func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `{
-      "sqs" : {
+      "sqs_client" : {
         "region" : "us-east-1",
+				"endpoint" : "http://localhost:3000/sqs"
+			},
+			"sqs_queue" : {
+				"region" : "us-east-1",
         "aws_account_id" : "345833302425",
         "queue_name" : "testQueue"
       },
-      "dynamodb" : {
+      "dynamodb_client" : {
         "region" : "us-east-1",
+				"endpoint" : "http://localhost:8000/dynamodb"
+			},
+			"dynamodb_table" : {
         "table_name" : "testTable"
       },
       "str" : "testStr"
@@ -278,7 +414,7 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorValidation() {
 	c := &SampleConfig{}
 	err := DownloadJSONValidate(ts.URL, c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Field: SQS, not set"), err)
+	assert.Equal(s.T(), errors.New("Field: SQSQueue, not set"), err)
 }
 
 func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorInvalidJSON() {
