@@ -31,6 +31,10 @@ func (c S3Config) GetFullPath(basePath string) string {
 	return fmt.Sprintf("%s.%s", basePath, *c.FileExt)
 }
 
+func (c S3Config) GetRegion() AWSRegion {
+	return *c.Region
+}
+
 func (c S3Config) GetExpiry() uint {
 	if c.Expiry != nil {
 		return *c.Expiry
