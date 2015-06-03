@@ -52,7 +52,7 @@ func (s *S3SigningSuite) TestBuildSignedS3URLUSWest2() {
 	assert.Regexp(s.T(), urlRegexp, signedURL)
 }
 
-func (s *S3SigningSuite) TestBuildSignedS3URLErrorNoURL() {
+func (s *S3SigningSuite) TestBuildSignedS3URLErrorURLParse() {
 	signedURL, err := BuildSignedS3URL("invalid%6", VALID_S3_REGION_US_WEST_2, VALID_S3_EXPIRY)
 	assert.Equal(s.T(), "", signedURL)
 	assert.NotNil(s.T(), err)

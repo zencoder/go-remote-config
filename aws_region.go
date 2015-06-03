@@ -16,6 +16,18 @@ const (
 	AWS_REGION_SA_EAST_1      AWSRegion = "sa-east-1"
 )
 
+var AWSRegions = []AWSRegion{
+	AWS_REGION_US_EAST_1,
+	AWS_REGION_US_WEST_1,
+	AWS_REGION_US_WEST_2,
+	AWS_REGION_EU_WEST_1,
+	AWS_REGION_EU_CENTRAL_1,
+	AWS_REGION_AP_SOUTHEAST_1,
+	AWS_REGION_AP_SOUTHEAST_2,
+	AWS_REGION_AP_NORTHEAST_1,
+	AWS_REGION_SA_EAST_1,
+}
+
 var (
 	ErrAWSRegionEmptyString = errors.New("Region cannot be empty")
 	ErrAWSRegionInvalid     = errors.New("Region is invalid")
