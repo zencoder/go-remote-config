@@ -3,7 +3,6 @@ package remoteconfig
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -81,8 +80,6 @@ func S3URLToConfig(s3URL string) (*S3Config, string, error) {
 	fileExt := filepath.Ext(key)[1:]
 
 	key = key[:len(key)-len(fileExt)-1]
-
-	log.Printf("BaseBucket = %s, Region = %s, FileExt = %s, Key = %s", baseBucket, region, fileExt, key)
 
 	c.BaseBucket = &baseBucket
 	c.Region = &region
