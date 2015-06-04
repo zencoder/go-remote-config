@@ -14,7 +14,7 @@ var (
 	ErrS3SigningInvalidS3URLScheme error = errors.New("S3 URL does have s3:// scheme.")
 )
 
-func BuildSignedS3URL(s3URL string, s3Region AWSRegion, expiry uint) (string, error) {
+func BuildSignedS3URL(s3URL string, s3Region AWSRegion, expiry uint, endpoint string) (string, error) {
 	pURL, err := url.Parse(s3URL)
 	if err != nil {
 		return "", err
@@ -30,13 +30,14 @@ func BuildSignedS3URL(s3URL string, s3Region AWSRegion, expiry uint) (string, er
 	bucket := pURL.Host
 	key := strings.TrimPrefix(pURL.Path, "/")
 
-	return generateSignedS3URL(s3Region, bucket, key, expiry)
+	return generateSignedS3URL(s3Region, bucket, key, expiry, endpoint)
 }
 
-func generateSignedS3URL(region AWSRegion, bucket string, key string, expiry uint) (string, error) {
+func generateSignedS3URL(region AWSRegion, bucket string, key string, expiry uint, endpoint string) (string, error) {
 	svc := s3.New(&aws.Config{
 		Credentials: aws.DefaultCreds(),
 		Region:      string(region),
+		Endpoint:    endpoint,
 	})
 
 	var req *aws.Request

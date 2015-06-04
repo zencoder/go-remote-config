@@ -8,7 +8,10 @@ import (
 	"strings"
 )
 
-const DEFAULT_S3_EXPIRY uint = 60
+const (
+	DEFAULT_S3_EXPIRY   uint   = 60
+	DEFAULT_S3_ENDPOINT string = ""
+)
 
 type Validater interface {
 	Validate() error
@@ -17,9 +20,9 @@ type Validater interface {
 // Downloads a configuration JSON file from S3.
 // Parses it to a particular struct type and runs a validation.
 // URL should be of the format s3://bucket/path/file.json
-func LoadConfigFromS3(configURL string, configRegion AWSRegion, configStruct interface{}) error {
+func LoadConfigFromS3(configURL string, configRegion AWSRegion, configEndpoint string, configStruct interface{}) error {
 	// Build a Signed URL to the config file in S3
-	signedURL, err := BuildSignedS3URL(configURL, configRegion, DEFAULT_S3_EXPIRY)
+	signedURL, err := BuildSignedS3URL(configURL, configRegion, DEFAULT_S3_EXPIRY, configEndpoint)
 	if err != nil {
 		return err
 	}

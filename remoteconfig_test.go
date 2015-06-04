@@ -17,6 +17,7 @@ const (
 	VALID_REMOTE_CONFIG_SQS_QUEUE_NAME         string    = "testQueue"
 	VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION AWSRegion = AWS_REGION_US_EAST_1
 	VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME    string    = "testTable"
+	VALID_REMOTE_CONFIG_NO_ENDPOINT            string    = ""
 )
 
 type RemoteConfigSuite struct {
@@ -359,7 +360,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 
 func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
 	c := &SQSQueueConfig{}
-	err := LoadConfigFromS3("invalid", AWSRegion("invalid"), c)
+	err := LoadConfigFromS3("invalid", AWSRegion("invalid"), VALID_REMOTE_CONFIG_NO_ENDPOINT, c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("S3 URL does not start with the s3:// scheme"), err)
 }
