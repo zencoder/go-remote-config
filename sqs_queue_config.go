@@ -9,6 +9,9 @@ type SQSQueueConfig struct {
 }
 
 // Returns a full SQS queue URL.
-func (s SQSQueueConfig) GetURL() string {
-	return fmt.Sprintf("https://sqs.%s.amazonaws.com/%s/%s", *s.Region, *s.AWSAccountID, *s.QueueName)
+func (s SQSQueueConfig) GetURL(endpoint string) string {
+	if endpoint == "" {
+		return fmt.Sprintf("https://sqs.%s.amazonaws.com/%s/%s", *s.Region, *s.AWSAccountID, *s.QueueName)
+	}
+	return fmt.Sprintf("%s/%s/%s", endpoint, *s.AWSAccountID, *s.QueueName)
 }
