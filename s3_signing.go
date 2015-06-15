@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/awslabs/aws-sdk-go/aws"
+	"github.com/awslabs/aws-sdk-go/aws/credentials"
 	"github.com/awslabs/aws-sdk-go/service/s3"
 )
 
@@ -34,8 +35,9 @@ func BuildSignedS3URL(s3URL string, s3Region AWSRegion, expiry uint, endpoint st
 }
 
 func generateSignedS3URL(region AWSRegion, bucket string, key string, expiry uint, endpoint string) (string, error) {
+	creds := credentials.NewEnvCredentials()
 	svc := s3.New(&aws.Config{
-		Credentials: aws.DefaultCreds(),
+		Credentials: creds,
 		Region:      string(region),
 		Endpoint:    endpoint,
 	})

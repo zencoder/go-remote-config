@@ -7,35 +7,39 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/aws",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
+		},
+		{
+			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/apierr",
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/endpoints",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/protocol/query",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/protocol/rest",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/protocol/restxml",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/protocol/xml/xmlutil",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/internal/signer/v4",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/awslabs/aws-sdk-go/service/s3",
-			"Rev": "44bfbd5e852715e1acfcd49da3f5688e4b5377ac"
+			"Rev": "850ec80408c5f0a76110b677514bb83b95969899"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",

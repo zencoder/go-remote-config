@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+// Parse parses an object i and fills a url.Values object. The isEC2 flag
+// indicates if this is the EC2 Query sub-protocol.
 func Parse(body url.Values, i interface{}, isEC2 bool) error {
 	q := queryParser{isEC2: isEC2}
 	return q.parseValue(body, reflect.ValueOf(i), "", "")
@@ -103,6 +105,12 @@ func (q *queryParser) parseStruct(v url.Values, value reflect.Value, prefix stri
 }
 
 func (q *queryParser) parseList(v url.Values, value reflect.Value, prefix string, tag reflect.StructTag) error {
+	// If it's empty, generate an empty value
+	if !value.IsNil() && value.Len() == 0 {
+		v.Set(prefix, "")
+		return nil
+	}
+
 	// check for unflattened list member
 	if !q.isEC2 && tag.Get("flattened") == "" {
 		prefix += ".member"
@@ -123,6 +131,12 @@ func (q *queryParser) parseList(v url.Values, value reflect.Value, prefix string
 }
 
 func (q *queryParser) parseMap(v url.Values, value reflect.Value, prefix string, tag reflect.StructTag) error {
+	// If it's empty, generate an empty value
+	if !value.IsNil() && value.Len() == 0 {
+		v.Set(prefix, "")
+		return nil
+	}
+
 	// check for unflattened list member
 	if !q.isEC2 && tag.Get("flattened") == "" {
 		prefix += ".entry"
@@ -144,12 +158,21 @@ func (q *queryParser) parseMap(v url.Values, value reflect.Value, prefix string,
 		mapKey := mapKeys[mapKeyName]
 		mapValue := value.MapIndex(mapKey)
 
+		kname := tag.Get("locationNameKey")
+		if kname == "" {
+			kname = "key"
+		}
+		vname := tag.Get("locationNameValue")
+		if vname == "" {
+			vname = "value"
+		}
+
 		// serialize key
 		var keyName string
 		if prefix == "" {
-			keyName = strconv.Itoa(i+1) + ".key"
+			keyName = strconv.Itoa(i+1) + "." + kname
 		} else {
-			keyName = prefix + "." + strconv.Itoa(i+1) + ".key"
+			keyName = prefix + "." + strconv.Itoa(i+1) + "." + kname
 		}
 
 		if err := q.parseValue(v, mapKey, keyName, ""); err != nil {
@@ -159,9 +182,9 @@ func (q *queryParser) parseMap(v url.Values, value reflect.Value, prefix string,
 		// serialize value
 		var valueName string
 		if prefix == "" {
-			valueName = strconv.Itoa(i+1) + ".value"
+			valueName = strconv.Itoa(i+1) + "." + vname
 		} else {
-			valueName = prefix + "." + strconv.Itoa(i+1) + ".value"
+			valueName = prefix + "." + strconv.Itoa(i+1) + "." + vname
 		}
 
 		if err := q.parseValue(v, mapValue, valueName, ""); err != nil {
@@ -177,7 +200,9 @@ func (q *queryParser) parseScalar(v url.Values, r reflect.Value, name string, ta
 	case string:
 		v.Set(name, value)
 	case []byte:
-		v.Set(name, base64.StdEncoding.EncodeToString(value))
+		if !r.IsNil() {
+			v.Set(name, base64.StdEncoding.EncodeToString(value))
+		}
 	case bool:
 		v.Set(name, strconv.FormatBool(value))
 	case int64:
