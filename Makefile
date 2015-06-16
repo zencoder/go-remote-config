@@ -5,6 +5,10 @@ ifdef CIRCLE_ARTIFACTS
 endif
 
 all: build test cover
+godep:
+	go get github.com/tools/godep
+godep-save:
+	godep save ./...
 build:
 	if [ ! -d bin ]; then mkdir bin; fi
 	$(GO) build -v -o bin/go-remote-config
