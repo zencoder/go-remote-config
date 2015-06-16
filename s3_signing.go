@@ -35,11 +35,17 @@ func BuildSignedS3URL(s3URL string, s3Region AWSRegion, expiry uint, endpoint st
 }
 
 func generateSignedS3URL(region AWSRegion, bucket string, key string, expiry uint, endpoint string) (string, error) {
+	s3ForcePathStyle := false
+	if endpoint != "" {
+		s3ForcePathStyle = true
+	}
+
 	creds := credentials.NewEnvCredentials()
 	svc := s3.New(&aws.Config{
-		Credentials: creds,
-		Region:      string(region),
-		Endpoint:    endpoint,
+		Credentials:      creds,
+		Region:           string(region),
+		Endpoint:         endpoint,
+		S3ForcePathStyle: s3ForcePathStyle,
 	})
 
 	var req *aws.Request
