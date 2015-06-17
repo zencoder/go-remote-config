@@ -3,6 +3,7 @@ package remoteconfig
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -62,11 +63,28 @@ func DownloadJSONValidate(signedURL string, configStruct interface{}) error {
 // Validates a configuration struct.
 // Uses reflection to determine and call the correct Validation methods for each type.
 func validateConfigWithReflection(c interface{}) error {
+	t := reflect.TypeOf(c)
+	log.Printf("Kind = %v, Name = %v", t.Kind(), t.Name())
+	if t.Kind() == reflect.Slice {
+		log.Printf("Got Slice Type. %v", t)
+		for i := 0; i < t.Len(); i++ {
+			if err := validateConfigWithReflection(reflect.ValueOf(c).Index(i)); err != nil {
+				return err
+			}
+		}
+	}
 	valueElem := reflect.ValueOf(c).Elem()
 	typeElem := reflect.TypeOf(c).Elem()
 
 	// Gets a refection Type value for the Validater interface
 	validaterType := reflect.TypeOf((*Validater)(nil)).Elem()
+
+	// If the Validater interface is implemented, call the Validate method
+	if typeElem.Implements(validaterType) {
+		if err := valueElem.Interface().(Validater).Validate(); err != nil {
+			return fmt.Errorf("Validater Field: %s, failed to validate with error, %s", typeElem.Name(), err)
+		}
+	}
 
 	for i := 0; i < valueElem.NumField(); i++ {
 		valueField := valueElem.Field(i)
