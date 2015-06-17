@@ -3,7 +3,6 @@ package remoteconfig
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -63,17 +62,6 @@ func DownloadJSONValidate(signedURL string, configStruct interface{}) error {
 // Validates a configuration struct.
 // Uses reflection to determine and call the correct Validation methods for each type.
 func validateConfigWithReflection(c interface{}) error {
-	t := reflect.TypeOf(c)
-	log.Printf("reflect.Typeof = %v, Kind = %v, Name = %v", t, t.Kind(), t.Name())
-	if t.Kind() == reflect.Slice {
-		log.Printf("Got Slice Type. %v", t)
-		for i := 0; i < t.Len(); i++ {
-			if err := validateConfigWithReflection(reflect.ValueOf(c).Index(i)); err != nil {
-				return err
-			}
-		}
-	}
-	log.Printf("reflect.ValueOf(c) = %v, reflect.TypeOf(c) = %v", reflect.ValueOf(c), reflect.TypeOf(c))
 	valueElem := reflect.ValueOf(c).Elem()
 	typeElem := reflect.TypeOf(c).Elem()
 
@@ -97,6 +85,16 @@ func validateConfigWithReflection(c interface{}) error {
 		if valueField.IsNil() && !optional {
 			return fmt.Errorf("Field: %s, not set", typeField.Name)
 		} else if valueField.IsNil() && optional {
+			continue
+		}
+
+		// Handle a slice type
+		if valueField.Kind() == reflect.Slice {
+			for i := 0; i < valueField.Len(); i++ {
+				if err := validateConfigWithReflection(valueField.Index(i).Interface()); err != nil {
+					return err
+				}
+			}
 			continue
 		}
 

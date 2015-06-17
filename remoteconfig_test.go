@@ -410,7 +410,15 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
 			"dynamodb_table" : {
         "table_name" : "testTable"
       },
-      "str" : "testStr"
+      "str" : "testStr",
+			"storage_config" : {
+				"provider" : "aws",
+				"location" : "us-west-2"
+			},
+			"storage_config_slice" : [{
+				"provider" : "aws",
+				"location" : "us-west-2"
+			}]
     }`)
 	}))
 	defer ts.Close()
