@@ -64,7 +64,7 @@ func DownloadJSONValidate(signedURL string, configStruct interface{}) error {
 // Uses reflection to determine and call the correct Validation methods for each type.
 func validateConfigWithReflection(c interface{}) error {
 	t := reflect.TypeOf(c)
-	log.Printf("Kind = %v, Name = %v", t.Kind(), t.Name())
+	log.Printf("reflect.Typeof = %v, Kind = %v, Name = %v", t, t.Kind(), t.Name())
 	if t.Kind() == reflect.Slice {
 		log.Printf("Got Slice Type. %v", t)
 		for i := 0; i < t.Len(); i++ {
@@ -73,6 +73,7 @@ func validateConfigWithReflection(c interface{}) error {
 			}
 		}
 	}
+	log.Printf("reflect.ValueOf(c) = %v, reflect.TypeOf(c) = %v", reflect.ValueOf(c), reflect.TypeOf(c))
 	valueElem := reflect.ValueOf(c).Elem()
 	typeElem := reflect.TypeOf(c).Elem()
 

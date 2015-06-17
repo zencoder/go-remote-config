@@ -36,15 +36,15 @@ type SampleConfig struct {
 	DynamoDBTableOptional      *DynamoDBTableConfig  `json:"dynamodb_table_optional,omitempty" remoteconfig:"optional"`
 	DynamoDBClientOptional     *DynamoDBClientConfig `json:"dynamodb_client_optional,omitempty" remoteconfig:"optional"`
 	StrOptional                *string               `json:"str_optional,omitempty" remoteconfig:"optional"`
+	StorageConfigOptional      *StorageConfig        `json:"storage_config_optional,omitempty" remoteconfig:"optional"`
+	StorageConfigSliceOptional []*StorageConfig      `json:"storage_config_slice_optional,omitempty" remoteconfig:"optional"`
 	SQSQueue                   *SQSQueueConfig       `json:"sqs_queue,omitempty"`
 	SQSClient                  *SQSClientConfig      `json:"sqs_client,omitempty"`
 	DynamoDBTable              *DynamoDBTableConfig  `json:"dynamodb_table,omitempty"`
 	DynamoDBClient             *DynamoDBClientConfig `json:"dynamodb_client,omitempty"`
 	Str                        *string               `json:"str,omitempty"`
 	StorageConfig              *StorageConfig        `json:"storage_config,omitempty"`
-	StorageConfigOptional      *StorageConfig        `json:"storage_config_optional,omitempty" remoteconfig:"optional"`
 	StorageConfigSlice         []*StorageConfig      `json:"storage_config_slice,omitempty"`
-	StorageConfigSliceOptional []*StorageConfig      `json:"storage_config_slice_optional,omitempty" remoteconfig:"optional"`
 }
 
 func (s *RemoteConfigSuite) SetupSuite() {
