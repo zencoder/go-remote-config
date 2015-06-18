@@ -90,6 +90,9 @@ func validateConfigWithReflection(c interface{}) error {
 
 		// Handle a slice type
 		if valueField.Kind() == reflect.Slice {
+			if valueField.Len() <= 0 {
+				return fmt.Errorf("Slice Field: %s, is empty", typeField.Name)
+			}
 			for i := 0; i < valueField.Len(); i++ {
 				if err := validateConfigWithReflection(valueField.Index(i).Interface()); err != nil {
 					return err

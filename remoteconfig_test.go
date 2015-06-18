@@ -384,6 +384,139 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 	assert.Equal(s.T(), errors.New("String Field: Str, contains an empty string"), err)
 }
 
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigNotSet() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
+	}
+
+	str := "testString"
+
+	c := &SampleConfig{
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: dynamodbClient,
+		Str:            &str,
+		StorageConfig:  nil,
+	}
+
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Field: StorageConfig, not set"), err)
+}
+
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceNotSet() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
+	}
+
+	str := "testString"
+
+	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
+	storageLocation := VALID_REMOTE_CONFIG_STORAGE_CONFIG_LOCATION
+	storageConfig := &StorageConfig{
+		Provider: &storageProvider,
+		Location: &storageLocation,
+	}
+
+	c := &SampleConfig{
+		SQSQueue:           sqsQueue,
+		SQSClient:          sqsClient,
+		DynamoDBTable:      dynamodbTable,
+		DynamoDBClient:     dynamodbClient,
+		Str:                &str,
+		StorageConfig:      storageConfig,
+		StorageConfigSlice: nil,
+	}
+
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Field: StorageConfigSlice, not set"), err)
+}
+
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceEmpty() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
+	}
+
+	str := "testString"
+
+	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
+	storageLocation := VALID_REMOTE_CONFIG_STORAGE_CONFIG_LOCATION
+	storageConfig := &StorageConfig{
+		Provider: &storageProvider,
+		Location: &storageLocation,
+	}
+
+	c := &SampleConfig{
+		SQSQueue:           sqsQueue,
+		SQSClient:          sqsClient,
+		DynamoDBTable:      dynamodbTable,
+		DynamoDBClient:     dynamodbClient,
+		Str:                &str,
+		StorageConfig:      storageConfig,
+		StorageConfigSlice: []*StorageConfig{},
+	}
+
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Slice Field: StorageConfigSlice, is empty"), err)
+}
+
 func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
 	c := &SQSQueueConfig{}
 	err := LoadConfigFromS3("invalid", AWSRegion("invalid"), VALID_REMOTE_CONFIG_NO_ENDPOINT, c)
@@ -418,6 +551,10 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
 			"storage_config_slice" : [{
 				"provider" : "aws",
 				"location" : "us-west-2"
+			},
+			{
+				"provider" : "aws",
+				"location" : "us-east-1"
 			}]
     }`)
 	}))
