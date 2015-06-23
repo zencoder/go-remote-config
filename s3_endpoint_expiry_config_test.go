@@ -10,19 +10,8 @@ import (
 
 const (
 	VALID_S3_ENDPOINT_EXPIRY_CONFIG_ENDPOINT string = "http://localhost:9500/s3"
-	//VALID_S3_CONFIG_BASE_BUCKET string    = "base-bucket"
-	//VALID_S3_CONFIG_REGION      AWSRegion = AWS_REGION_US_WEST_2
-	//VALID_S3_CONFIG_FILE_EXT    string    = "json"
-	VALID_S3_ENDPOINT_EXPIRY_CONFIG_EXPIRY uint = 30
-	//VALID_S3_CONFIG_TEST_PATH   string    = "test/path"
+	VALID_S3_ENDPOINT_EXPIRY_CONFIG_EXPIRY   uint   = 30
 )
-
-/*
-var (
-	VALID_S3_CONFIG_FULL_BUCKET_NAME string = fmt.Sprintf("%s-%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION)
-	VALID_S3_CONFIG_FULL_PATH        string = fmt.Sprintf("%s.%s", VALID_S3_CONFIG_TEST_PATH, VALID_S3_CONFIG_FILE_EXT)
-	VALID_S3_CONFIG_S3_SCHEME_URL    string = fmt.Sprintf("s3://%s-%s/%s.%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION, VALID_S3_CONFIG_TEST_PATH, VALID_S3_CONFIG_FILE_EXT)
-)*/
 
 type S3EndpointExpiryConfigSuite struct {
 	suite.Suite
