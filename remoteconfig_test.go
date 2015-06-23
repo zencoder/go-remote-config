@@ -525,38 +525,41 @@ func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
 }
 
 func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
+	configJSON := `
+	{
+		"sqs_client" : {
+			"region" : "us-east-1",
+			"endpoint" : "http://localhost:3000/sqs"
+		},
+		"sqs_queue" : {
+			"region" : "us-east-1",
+			"aws_account_id" : "345833302425",
+			"queue_name" : "testQueue"
+		},
+		"dynamodb_client" : {
+			"region" : "us-east-1",
+			"endpoint" : "http://localhost:8000/dynamodb"
+		},
+		"dynamodb_table" : {
+			"table_name" : "testTable"
+		},
+		"str" : "testStr",
+		"storage_config" : {
+			"provider" : "aws",
+			"location" : "us-west-2"
+		},
+		"storage_config_slice" : [{
+			"provider" : "aws",
+			"location" : "us-west-2"
+		},
+		{
+			"provider" : "aws",
+			"location" : "us-east-1"
+		}]
+	}`
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{
-      "sqs_client" : {
-        "region" : "us-east-1",
-				"endpoint" : "http://localhost:3000/sqs"
-			},
-			"sqs_queue" : {
-				"region" : "us-east-1",
-        "aws_account_id" : "345833302425",
-        "queue_name" : "testQueue"
-      },
-      "dynamodb_client" : {
-        "region" : "us-east-1",
-				"endpoint" : "http://localhost:8000/dynamodb"
-			},
-			"dynamodb_table" : {
-        "table_name" : "testTable"
-      },
-      "str" : "testStr",
-			"storage_config" : {
-				"provider" : "aws",
-				"location" : "us-west-2"
-			},
-			"storage_config_slice" : [{
-				"provider" : "aws",
-				"location" : "us-west-2"
-			},
-			{
-				"provider" : "aws",
-				"location" : "us-east-1"
-			}]
-    }`)
+		fmt.Fprintln(w, configJSON)
 	}))
 	defer ts.Close()
 
