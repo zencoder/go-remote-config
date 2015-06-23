@@ -20,5 +20,5 @@ func (c S3EndpointExpiryConfig) GetExpiry() uint {
 	if c.Expiry != nil {
 		return *c.Expiry
 	}
-	return S3_CONFIG_DEFAULT_EXPIRY
+	return S3_ENDPOINT_EXPIRY_CONFIG_DEFAULT_EXPIRY
 }
