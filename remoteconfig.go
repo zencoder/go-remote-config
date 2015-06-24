@@ -68,6 +68,13 @@ func validateConfigWithReflection(c interface{}) error {
 	// Gets a refection Type value for the Validater interface
 	validaterType := reflect.TypeOf((*Validater)(nil)).Elem()
 
+	// If the Validater interface is implemented, call the Validate method
+	if typeElem.Implements(validaterType) {
+		if err := valueElem.Interface().(Validater).Validate(); err != nil {
+			return fmt.Errorf("Validater Field: %s, failed to validate with error, %s", typeElem.Name(), err)
+		}
+	}
+
 	for i := 0; i < valueElem.NumField(); i++ {
 		valueField := valueElem.Field(i)
 		typeField := typeElem.Field(i)
@@ -78,6 +85,19 @@ func validateConfigWithReflection(c interface{}) error {
 		if valueField.IsNil() && !optional {
 			return fmt.Errorf("Field: %s, not set", typeField.Name)
 		} else if valueField.IsNil() && optional {
+			continue
+		}
+
+		// Handle a slice type
+		if valueField.Kind() == reflect.Slice {
+			if valueField.Len() <= 0 {
+				return fmt.Errorf("Slice Field: %s, is empty", typeField.Name)
+			}
+			for i := 0; i < valueField.Len(); i++ {
+				if err := validateConfigWithReflection(valueField.Index(i).Interface()); err != nil {
+					return err
+				}
+			}
 			continue
 		}
 
