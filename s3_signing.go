@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
@@ -40,9 +39,8 @@ func generateSignedS3URL(region AWSRegion, bucket string, key string, expiry uin
 		s3ForcePathStyle = true
 	}
 
-	creds := credentials.NewEnvCredentials()
+	// We want to use the default credentials chain so that it will attempt Env & Instance role creds
 	svc := s3.New(&aws.Config{
-		Credentials:      creds,
 		Region:           string(region),
 		Endpoint:         endpoint,
 		S3ForcePathStyle: s3ForcePathStyle,
