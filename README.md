@@ -2,7 +2,7 @@
 
 [![godoc](https://godoc.org/github.com/zencoder/go-remote-config?status.svg)](http://godoc.org/github.com/zencoder/go-remote-config)
 [![Circle CI](https://circleci.com/gh/zencoder/go-remote-config.svg?style=svg)](https://circleci.com/gh/zencoder/go-remote-config)
-[![Coverage Status](https://coveralls.io/repos/zencoder/go-remote-config/badge.svg?branch=master)](https://coveralls.io/r/zencoder/go-remote-config?branch=master)
+[![Coverage Status](https://coveralls.io/repos/zencoder/go-remote-config/badge.svg?branch=master&t=VFcsMv)](https://coveralls.io/r/zencoder/go-remote-config?branch=master)
 
 A Go library for configuration management with JSON files in remote storage.
 
