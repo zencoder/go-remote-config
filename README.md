@@ -22,7 +22,7 @@ Features
   * Optional fields
   * Custom Validate interface
   * Empty string checks
-  * Stuct & Slice, nested support
+  * Struct & Slice, nested support
 * Built in config structs for services
   * AWS Regions
   * AWS DynamoDB (Client + Table)
