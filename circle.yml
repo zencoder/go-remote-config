@@ -18,4 +18,4 @@ test:
     - cd ~/.go_workspace/src/github.com/zencoder/go-remote-config && make test
   post:
     - cd ~/.go_workspace/src/github.com/zencoder/go-remote-config && make cover
-    - cd ~/.go_workspace/src/github.com/zencoder/go-remote-config && make coveralls
+    - cd ~/.go_workspace/src/github.com/zencoder/go-remote-config && make coveralls; echo "Coveralls Finished"
