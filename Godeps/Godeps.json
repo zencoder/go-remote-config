@@ -1,49 +1,46 @@
 {
 	"ImportPath": "github.com/zencoder/go-remote-config",
-	"GoVersion": "go1.4.1",
-	"Packages": [
-		"./..."
-	],
+	"GoVersion": "go1.4.2",
 	"Deps": [
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/aws",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/endpoints",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/query",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/rest",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/restxml",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/protocol/xml/xmlutil",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/internal/signer/v4",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/aws/aws-sdk-go/service/s3",
-			"Comment": "v0.6.4",
-			"Rev": "f4e37011d81e59702c156b071449ec16b37abcae"
+			"Comment": "v0.9.1rc2-2-gb9b0f30",
+			"Rev": "b9b0f3006cf109eca8725939d138180037493596"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",

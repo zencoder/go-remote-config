@@ -41,13 +41,12 @@ func generateSignedS3URL(region AWSRegion, bucket string, key string, expiry uin
 
 	// We want to use the default credentials chain so that it will attempt Env & Instance role creds
 	svc := s3.New(&aws.Config{
-		Region:           string(region),
-		Endpoint:         endpoint,
-		S3ForcePathStyle: s3ForcePathStyle,
+		Region:           aws.String(string(region)),
+		Endpoint:         aws.String(endpoint),
+		S3ForcePathStyle: aws.Bool(s3ForcePathStyle),
 	})
 
-	var req *aws.Request
-	req, _ = svc.GetObjectRequest(&s3.GetObjectInput{
+	req, _ := svc.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: &bucket,
 		Key:    &key,
 	})
