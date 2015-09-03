@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/service/swf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -32,22 +33,25 @@ func (s *SimpleWorkflowConfigSuite) TestValidate() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := WorkflowType{Name: &name, Version: &version}
+	workflowType := swf.WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
 		WorkflowType: &workflowType,
 	}
 
-	err := validateConfigWithReflection(c)
-	assert.Nil(s.T(), err)
+	assert.NotNil(s.T(), c)
+	assert.Equal(s.T(), c.Domain, &domain)
+	assert.NotNil(s.T(), c.WorkflowType)
+	assert.Equal(s.T(), c.WorkflowType.Name, &name)
+	assert.Equal(s.T(), c.WorkflowType.Version, &version)
 }
 
 func (s *SimpleWorkflowConfigSuite) TestValidateErrorDomain() {
 	domain := ""
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := WorkflowType{Name: &name, Version: &version}
+	workflowType := swf.WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -63,7 +67,7 @@ func (s *SimpleWorkflowConfigSuite) TestGetDomain() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := WorkflowType{Name: &name, Version: &version}
+	workflowType := swf.WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -77,7 +81,7 @@ func (s *SimpleWorkflowConfigSuite) TestValidateErrorWorkflowType() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := ""
 	version := ""
-	workflowType := WorkflowType{Name: &name, Version: &version}
+	workflowType := swf.WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -93,7 +97,7 @@ func (s *SimpleWorkflowConfigSuite) TestGetWorkflowType() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := WorkflowType{Name: &name, Version: &version}
+	workflowType := swf.WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
