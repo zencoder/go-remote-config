@@ -4,7 +4,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/aws/aws-sdk-go/service/swf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -33,25 +32,22 @@ func (s *SimpleWorkflowConfigSuite) TestValidate() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := swf.WorkflowType{Name: &name, Version: &version}
+	workflowType := WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
 		WorkflowType: &workflowType,
 	}
 
-	assert.NotNil(s.T(), c)
-	assert.Equal(s.T(), c.Domain, &domain)
-	assert.NotNil(s.T(), c.WorkflowType)
-	assert.Equal(s.T(), c.WorkflowType.Name, &name)
-	assert.Equal(s.T(), c.WorkflowType.Version, &version)
+	err := validateConfigWithReflection(c)
+	assert.Nil(s.T(), err)
 }
 
 func (s *SimpleWorkflowConfigSuite) TestValidateErrorDomain() {
 	domain := ""
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := swf.WorkflowType{Name: &name, Version: &version}
+	workflowType := WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -67,7 +63,7 @@ func (s *SimpleWorkflowConfigSuite) TestGetDomain() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := swf.WorkflowType{Name: &name, Version: &version}
+	workflowType := WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -81,7 +77,7 @@ func (s *SimpleWorkflowConfigSuite) TestValidateErrorWorkflowType() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := ""
 	version := ""
-	workflowType := swf.WorkflowType{Name: &name, Version: &version}
+	workflowType := WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -97,7 +93,7 @@ func (s *SimpleWorkflowConfigSuite) TestGetWorkflowType() {
 	domain := VALID_SWF_WORKFLOW_DOMAIN
 	name := VALID_SWF_WORKFLOW_TYPE_NAME
 	version := VALID_SWF_WORKFLOW_TYPE_VERSION
-	workflowType := swf.WorkflowType{Name: &name, Version: &version}
+	workflowType := WorkflowType{Name: &name, Version: &version}
 
 	c := &SimpleWorkflowConfig{
 		Domain:       &domain,
@@ -105,4 +101,15 @@ func (s *SimpleWorkflowConfigSuite) TestGetWorkflowType() {
 	}
 
 	assert.Equal(s.T(), workflowType, c.GetWorkflowType())
+}
+
+func (s *SimpleWorkflowConfigSuite) TestWorkflowTypeToAWS() {
+	name := VALID_SWF_WORKFLOW_TYPE_NAME
+	version := VALID_SWF_WORKFLOW_TYPE_VERSION
+	workflowType := WorkflowType{Name: &name, Version: &version}
+
+	c := workflowType.ToAWS()
+
+	assert.Equal(s.T(), *workflowType.Name, *c.Name)
+	assert.Equal(s.T(), *workflowType.Version, *c.Version)
 }
