@@ -97,3 +97,5 @@ func LoadConfig(config interface{}) {
 
 }
 ```
+
+Coveralls FORK test
