@@ -97,3 +97,5 @@ func LoadConfig(config interface{}) {
 
 }
 ```
+
+TEST for Coveralls
