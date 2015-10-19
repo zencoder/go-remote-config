@@ -31,20 +31,23 @@ func TestRemoteConfigSuite(t *testing.T) {
 }
 
 type SampleConfig struct {
-	SQSQueueOptional           *SQSQueueConfig       `json:"sqs_queue_optional,omitempty" remoteconfig:"optional"`
-	SQSClientOptional          *SQSClientConfig      `json:"sqs_client_optional,omitempty" remoteconfig:"optional"`
-	DynamoDBTableOptional      *DynamoDBTableConfig  `json:"dynamodb_table_optional,omitempty" remoteconfig:"optional"`
-	DynamoDBClientOptional     *DynamoDBClientConfig `json:"dynamodb_client_optional,omitempty" remoteconfig:"optional"`
-	StrOptional                *string               `json:"str_optional,omitempty" remoteconfig:"optional"`
-	StorageConfigOptional      *StorageConfig        `json:"storage_config_optional,omitempty" remoteconfig:"optional"`
-	StorageConfigSliceOptional []*StorageConfig      `json:"storage_config_slice_optional,omitempty" remoteconfig:"optional"`
-	SQSQueue                   *SQSQueueConfig       `json:"sqs_queue,omitempty"`
-	SQSClient                  *SQSClientConfig      `json:"sqs_client,omitempty"`
-	DynamoDBTable              *DynamoDBTableConfig  `json:"dynamodb_table,omitempty"`
-	DynamoDBClient             *DynamoDBClientConfig `json:"dynamodb_client,omitempty"`
-	Str                        *string               `json:"str,omitempty"`
-	StorageConfig              *StorageConfig        `json:"storage_config,omitempty"`
-	StorageConfigSlice         []*StorageConfig      `json:"storage_config_slice,omitempty"`
+	SQSQueueOptional           *SQSQueueConfig           `json:"sqs_queue_optional,omitempty" remoteconfig:"optional"`
+	SQSClientOptional          *SQSClientConfig          `json:"sqs_client_optional,omitempty" remoteconfig:"optional"`
+	DynamoDBTableOptional      *DynamoDBTableConfig      `json:"dynamodb_table_optional,omitempty" remoteconfig:"optional"`
+	DynamoDBClientOptional     *DynamoDBClientConfig     `json:"dynamodb_client_optional,omitempty" remoteconfig:"optional"`
+	StrOptional                *string                   `json:"str_optional,omitempty" remoteconfig:"optional"`
+	StorageConfigOptional      *StorageConfig            `json:"storage_config_optional,omitempty" remoteconfig:"optional"`
+	StorageConfigSliceOptional []*StorageConfig          `json:"storage_config_slice_optional,omitempty" remoteconfig:"optional"`
+	SQSQueue                   *SQSQueueConfig           `json:"sqs_queue,omitempty"`
+	SQSClient                  *SQSClientConfig          `json:"sqs_client,omitempty"`
+	DynamoDBTable              *DynamoDBTableConfig      `json:"dynamodb_table,omitempty"`
+	DynamoDBClient             *DynamoDBClientConfig     `json:"dynamodb_client,omitempty"`
+	Str                        *string                   `json:"str,omitempty"`
+	StorageConfig              *StorageConfig            `json:"storage_config,omitempty"`
+	StorageConfigSlice         []*StorageConfig          `json:"storage_config_slice,omitempty"`
+	StorageConfigMap           map[string]*StorageConfig `json:"storage_config_map,omitempty"`
+	StrSlice                   []*string                 `json:"str_slice,omitempty" remoteconfig:"optional"`
+	MapStrStr                  map[string]*string        `json:"map_str_str,omitempty"`
 }
 
 func (s *RemoteConfigSuite) SetupSuite() {
@@ -54,49 +57,9 @@ func (s *RemoteConfigSuite) SetupTest() {
 }
 
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflection() {
-	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
-	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
-	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
-	sqsQueue := &SQSQueueConfig{
-		Region:       &sqsRegion,
-		AWSAccountID: &sqsAWSAccountID,
-		QueueName:    &sqsQueueName,
-	}
-	sqsClient := &SQSClientConfig{
-		Region: &sqsRegion,
-	}
-
-	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
-	dynamodbTable := &DynamoDBTableConfig{
-		TableName: &dynamodbTableName,
-	}
-
-	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
-	dynamodbClient := &DynamoDBClientConfig{
-		Region: &dynamodbClientRegion,
-	}
-
-	str := "testString"
-
-	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
-	storageLocation := VALID_REMOTE_CONFIG_STORAGE_CONFIG_LOCATION
-	storageConfig := &StorageConfig{
-		Provider: &storageProvider,
-		Location: &storageLocation,
-	}
-
-	c := &SampleConfig{
-		SQSQueue:           sqsQueue,
-		SQSClient:          sqsClient,
-		DynamoDBTable:      dynamodbTable,
-		DynamoDBClient:     dynamodbClient,
-		Str:                &str,
-		StorageConfig:      storageConfig,
-		StorageConfigSlice: []*StorageConfig{storageConfig},
-	}
-
+	c := s.buildValidSampleConfig()
 	err := validateConfigWithReflection(c)
-	assert.Nil(s.T(), err)
+	s.Nil(err)
 }
 
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionWithOptional() {
@@ -146,6 +109,8 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionWithOptional() {
 		Str:                        &str,
 		StorageConfig:              storageConfig,
 		StorageConfigSlice:         []*StorageConfig{storageConfig},
+		StorageConfigMap:           map[string]*StorageConfig{"one": storageConfig},
+		MapStrStr:                  map[string]*string{"hello": &str},
 	}
 
 	err := validateConfigWithReflection(c)
@@ -470,6 +435,38 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSl
 	assert.Equal(s.T(), errors.New("Field: StorageConfigSlice, not set"), err)
 }
 
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceNested() {
+	c := s.buildValidSampleConfig()
+	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
+	invalidStorageLocation := StorageLocation("")
+	c.StorageConfigSlice = []*StorageConfig{
+		&StorageConfig{
+			Provider: &storageProvider,
+			Location: &invalidStorageLocation,
+		},
+	}
+
+	err := validateConfigWithReflection(c)
+	s.NotNil(err)
+	s.Equal(errors.New("Validater Field: StorageConfig, failed to validate with error, Region cannot be empty"), err)
+}
+
+func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigMapNested() {
+	c := s.buildValidSampleConfig()
+	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
+	invalidStorageLocation := StorageLocation("")
+	c.StorageConfigMap = map[string]*StorageConfig{
+		"one": &StorageConfig{
+			Provider: &storageProvider,
+			Location: &invalidStorageLocation,
+		},
+	}
+
+	err := validateConfigWithReflection(c)
+	s.NotNil(err)
+	s.Equal(errors.New("Sub field of StorageConfigMap with key 'one' failed to validated with error, Validater Field: StorageConfig, failed to validate with error, Region cannot be empty"), err)
+}
+
 func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceEmpty() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
@@ -555,7 +552,15 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
 		{
 			"provider" : "aws",
 			"location" : "us-east-1"
-		}]
+		}],
+		"storage_config_map": {
+			"one": {
+				"provider": "aws",
+				"location": "us-west-2"
+			}
+		},
+		"str_slice": [ "hello" ],
+		"map_str_str": { "key": "value" }
 	}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -603,4 +608,49 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorInvalidJSON() {
 
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Failed to decode JSON, with error, invalid character 'T' looking for beginning of value"), err)
+}
+
+func (s *RemoteConfigSuite) buildValidSampleConfig() *SampleConfig {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
+	}
+
+	str := "testString"
+
+	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
+	storageLocation := VALID_REMOTE_CONFIG_STORAGE_CONFIG_LOCATION
+	storageConfig := &StorageConfig{
+		Provider: &storageProvider,
+		Location: &storageLocation,
+	}
+
+	return &SampleConfig{
+		SQSQueue:           sqsQueue,
+		SQSClient:          sqsClient,
+		DynamoDBTable:      dynamodbTable,
+		DynamoDBClient:     dynamodbClient,
+		Str:                &str,
+		StorageConfig:      storageConfig,
+		StorageConfigSlice: []*StorageConfig{storageConfig},
+		StorageConfigMap:   map[string]*StorageConfig{"one": storageConfig},
+		MapStrStr:          map[string]*string{"hello": &str},
+	}
 }

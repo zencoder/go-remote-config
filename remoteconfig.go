@@ -94,8 +94,26 @@ func validateConfigWithReflection(c interface{}) error {
 				return fmt.Errorf("Slice Field: %s, is empty", typeField.Name)
 			}
 			for i := 0; i < valueField.Len(); i++ {
-				if err := validateConfigWithReflection(valueField.Index(i).Interface()); err != nil {
+				sliceValue := valueField.Index(i)
+				if sliceValue.Kind() != reflect.Ptr || sliceValue.IsNil() || sliceValue.Elem().Kind() != reflect.Struct {
+					continue
+				}
+				if err := validateConfigWithReflection(sliceValue.Interface()); err != nil {
 					return err
+				}
+			}
+			continue
+		}
+
+		// Handle a map type
+		if valueField.Kind() == reflect.Map {
+			for _, key := range valueField.MapKeys() {
+				mapValue := valueField.MapIndex(key)
+				if mapValue.Kind() != reflect.Ptr || mapValue.IsNil() || mapValue.Elem().Kind() != reflect.Struct {
+					continue
+				}
+				if err := validateConfigWithReflection(mapValue.Interface()); err != nil {
+					return fmt.Errorf("Sub field of %s with key '%s' failed to validated with error, %s", typeField.Name, key, err)
 				}
 			}
 			continue
