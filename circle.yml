@@ -8,6 +8,11 @@ checkout:
     - mkdir -p ~/.go_workspace/src/github.com/zencoder
     - cp -R ~/go-remote-config ~/.go_workspace/src/github.com/zencoder/go-remote-config
 dependencies:
+  pre:
+    - sudo apt-get remove --purge golang
+    - sudo rm -rf /usr/local/go/
+    - mkdir /tmp/go && wget 'https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz' -O /tmp/go/go1.5.1.linux-amd64.tar.gz
+    - sudo tar -xzf /tmp/go/go1.5.1.linux-amd64.tar.gz -C /usr/local
   override:
     - go get github.com/tools/godep
     - go get golang.org/x/tools/cmd/cover
