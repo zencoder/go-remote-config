@@ -47,15 +47,18 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Rev": "33a31e5dbed8302d5ab7e6d12b416e95c2c4ebc0"
+			"Comment": "v1.0-46-g2933ed9",
+			"Rev": "2933ed99aa7f9da7b72e821f9120bdf17131697e"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/require",
-			"Rev": "33a31e5dbed8302d5ab7e6d12b416e95c2c4ebc0"
+			"Comment": "v1.0-46-g2933ed9",
+			"Rev": "2933ed99aa7f9da7b72e821f9120bdf17131697e"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/suite",
-			"Rev": "33a31e5dbed8302d5ab7e6d12b416e95c2c4ebc0"
+			"Comment": "v1.0-46-g2933ed9",
+			"Rev": "2933ed99aa7f9da7b72e821f9120bdf17131697e"
 		},
 		{
 			"ImportPath": "github.com/vaughan0/go-ini",
