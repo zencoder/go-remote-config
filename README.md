@@ -10,6 +10,18 @@ Install
 -------
 	go get github.com/zencoder/go-remote-config
 
+Dependencies
+-------
+
+This library vendors its dependencies.
+
+Note that it uses a tag of aws-sdk-go, and fork of testify. IE:
+
+        cd $GOPATH/src/github.com/stretchr/
+        rm -rf testify
+        git clone github.com/juliancooper/testify
+
+
 Supported Storage Providers
 -------
 * AWS S3 (Signed URLs)
