@@ -6,29 +6,28 @@
 
 A Go library for configuration management with JSON files in remote storage.
 
-Install
--------
+## Install
+
 	go get github.com/zencoder/go-remote-config
 
-Dependencies
--------
+## Dependencies
 
-This library vendors its dependencies.
+This library vendors its dependencies. It is tested on go 1.5.1
 
-Note that it uses a tag of aws-sdk-go, and fork of testify. IE:
+Note that it uses a tag of aws-sdk-go, and a fork of testify. IE:
 
         cd $GOPATH/src/github.com/stretchr/
         rm -rf testify
         git clone github.com/juliancooper/testify
 
 
-Supported Storage Providers
--------
+## Supported Storage Providers
+
 * AWS S3 (Signed URLs)
 * HTTP/HTTPS
 
-Features
--------
+## Features
+
 * Reflection based config validation
   * Required fields
   * Optional fields
@@ -42,8 +41,8 @@ Features
   * AWS S3
   * Generic HTTP Endpoints
 
-Future Features
--------
+## Future Features
+
 * More storage provider support
   * Google Cloud Storage
   * Rackspace CloudFiles
@@ -51,8 +50,8 @@ Future Features
 * Config download retry support
 * Live config reloading
 
-Example
--------
+## Example
+
 ```go
 type SampleConfig struct {
 	SQSQueueOptional           *SQSQueueConfig       `json:"sqs_queue_optional,omitempty" remoteconfig:"optional"`
@@ -109,3 +108,17 @@ func LoadConfig(config interface{}) {
 
 }
 ```
+
+## Development
+
+### Build and run unit tests
+
+    make test
+    
+### CI
+
+[This library builds on Circle CI, here.](https://circleci.com/gh/zencoder/go-remote-config/)
+
+## License
+
+[Apache License Version 2.0](LICENSE)
