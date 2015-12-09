@@ -133,7 +133,7 @@ func (s *S3ConfigSuite) TestValidateErrorRegionInvalid() {
 	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
-func (s *S3ConfigSuite) TestValidateErrorFileExtNotSet() {
+func (s *S3ConfigSuite) TestValidateNoErrorFileExtNotSet() {
 	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
 	region := VALID_S3_CONFIG_REGION
 
@@ -144,8 +144,7 @@ func (s *S3ConfigSuite) TestValidateErrorFileExtNotSet() {
 	}
 
 	err := validateConfigWithReflection(c)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Field: FileExt, not set"), err)
+	assert.Nil(s.T(), err)
 }
 
 func (s *S3ConfigSuite) TestValidateErrorFileExtEmpty() {
@@ -315,4 +314,13 @@ func (s *S3ConfigSuite) TestS3URLToConfigErrorInvalidRegion() {
 	assert.Empty(s.T(), path)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Region not found in bucket name, base-bucket-invalid-region"), err)
+}
+
+func (s *S3ConfigSuite) TestS3URLToConfigNoExt() {
+	assert := assert.New(s.T())
+	config, key, err := S3URLToConfig("s3://foo-eu-central-1/bar/bat")
+	assert.Nil(err)
+	assert.NotNil(config)
+	assert.Equal("", *config.FileExt)
+	assert.NotEmpty(key)
 }

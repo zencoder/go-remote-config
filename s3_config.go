@@ -14,10 +14,10 @@ const (
 
 type S3Config struct {
 	Endpoint   *string    `json:"endpoint,omitempty" remoteconfig:"optional"`
-	BaseBucket *string    `json:"base_bucket,omitempty"`                    // i.e. base-bucket
-	Region     *AWSRegion `json:"region,omitempty"`                         // i.e. us-west-2
-	FileExt    *string    `json:"file_ext,omitempty"`                       // i.e. json
-	Expiry     *uint      `json:"expiry,omitempty" remoteconfig:"optional"` // i.e. 60
+	BaseBucket *string    `json:"base_bucket,omitempty"`                      // i.e. base-bucket
+	Region     *AWSRegion `json:"region,omitempty"`                           // i.e. us-west-2
+	FileExt    *string    `json:"file_ext,omitempty" remoteconfig:"optional"` // i.e. json
+	Expiry     *uint      `json:"expiry,omitempty" remoteconfig:"optional"`   // i.e. 60
 }
 
 func (c S3Config) GetEndpoint() string {
@@ -34,6 +34,9 @@ func (c S3Config) GetFullBucketName() string {
 
 func (c S3Config) GetFullPath(basePath string) string {
 	// i.e. basepath.json
+	if c.FileExt == nil {
+		return fmt.Sprintf("%s", basePath)
+	}
 	return fmt.Sprintf("%s.%s", basePath, *c.FileExt)
 }
 
@@ -54,7 +57,7 @@ func findAWSRegionForBucket(bucket string) (AWSRegion, error) {
 			return r, nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf("Region not found in bucket name, %s", bucket))
+	return "", fmt.Errorf("Region not found in bucket name, %s", bucket)
 }
 
 func S3URLToConfig(s3URL string) (*S3Config, string, error) {
@@ -77,7 +80,10 @@ func S3URLToConfig(s3URL string) (*S3Config, string, error) {
 	baseBucket := strings.TrimSuffix(bucket, "-"+string(region))
 
 	key := strings.TrimPrefix(pURL.Path, "/")
-	fileExt := filepath.Ext(key)[1:]
+	fileExt := filepath.Ext(key)
+	if fileExt != "" {
+		fileExt = fileExt[1:] // Remove dot
+	}
 
 	key = key[:len(key)-len(fileExt)-1]
 
