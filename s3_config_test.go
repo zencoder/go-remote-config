@@ -20,9 +20,10 @@ const (
 )
 
 var (
-	VALID_S3_CONFIG_FULL_BUCKET_NAME string = fmt.Sprintf("%s-%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION)
-	VALID_S3_CONFIG_FULL_PATH        string = fmt.Sprintf("%s.%s", VALID_S3_CONFIG_TEST_PATH, VALID_S3_CONFIG_FILE_EXT)
-	VALID_S3_CONFIG_S3_SCHEME_URL    string = fmt.Sprintf("s3://%s-%s/%s.%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION, VALID_S3_CONFIG_TEST_PATH, VALID_S3_CONFIG_FILE_EXT)
+	VALID_S3_CONFIG_FULL_BUCKET_NAME          string = fmt.Sprintf("%s-%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION)
+	VALID_S3_CONFIG_FULL_PATH                 string = fmt.Sprintf("%s.%s", VALID_S3_CONFIG_TEST_PATH, VALID_S3_CONFIG_FILE_EXT)
+	VALID_S3_CONFIG_S3_SCHEME_URL             string = fmt.Sprintf("s3://%s-%s/%s.%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION, VALID_S3_CONFIG_TEST_PATH, VALID_S3_CONFIG_FILE_EXT)
+	VALID_S3_CONFIG_S3_SCHEME_URL_NO_FILE_EXT string = fmt.Sprintf("s3://%s-%s/%s", VALID_S3_CONFIG_BASE_BUCKET, VALID_S3_CONFIG_REGION, VALID_S3_CONFIG_TEST_PATH)
 )
 
 type S3ConfigSuite struct {
@@ -283,6 +284,24 @@ func (s *S3ConfigSuite) TestS3URLToConfig() {
 	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
 	region := VALID_S3_CONFIG_REGION
 	fileExt := VALID_S3_CONFIG_FILE_EXT
+	s3ConfigExpected := &S3Config{
+		BaseBucket: &baseBucket,
+		Region:     &region,
+		FileExt:    &fileExt,
+	}
+	assert.Equal(s.T(), s3ConfigExpected, s3ConfigURL)
+	assert.Equal(s.T(), VALID_S3_CONFIG_TEST_PATH, path)
+}
+
+func (s *S3ConfigSuite) TestS3URLNoFileExtToConfig() {
+	s3ConfigURL, path, err := S3URLToConfig(VALID_S3_CONFIG_S3_SCHEME_URL_NO_FILE_EXT)
+	assert.NotNil(s.T(), s3ConfigURL)
+	assert.NotEmpty(s.T(), path)
+	assert.Nil(s.T(), err)
+
+	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
+	region := VALID_S3_CONFIG_REGION
+	fileExt := ""
 	s3ConfigExpected := &S3Config{
 		BaseBucket: &baseBucket,
 		Region:     &region,
