@@ -299,10 +299,6 @@ func (s *S3ConfigSuite) TestS3URLNoFileExtToConfig() {
 	assert.NotEmpty(s.T(), path)
 	assert.Nil(s.T(), err)
 
-	s.T().Log("File Extension length: ", len(*s3ConfigURL.FileExt))
-	if *s3ConfigURL.FileExt == "" {
-		s.T().Log("File extension is an empty string")
-	}
 	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
 	region := VALID_S3_CONFIG_REGION
 	fileExt := ""
