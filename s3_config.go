@@ -82,10 +82,9 @@ func S3URLToConfig(s3URL string) (*S3Config, string, error) {
 	key := strings.TrimPrefix(pURL.Path, "/")
 	fileExt := filepath.Ext(key)
 	if fileExt != "" {
-		fileExt = fileExt[1:] // Remove dot
+		fileExt = fileExt[1:]               // Remove dot
+		key = key[:len(key)-len(fileExt)-1] // Remove dot and file extension from key
 	}
-
-	key = key[:len(key)-len(fileExt)-1]
 
 	c.BaseBucket = &baseBucket
 	c.Region = &region
