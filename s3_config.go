@@ -34,7 +34,7 @@ func (c S3Config) GetFullBucketName() string {
 
 func (c S3Config) GetFullPath(basePath string) string {
 	// i.e. basepath.json
-	if c.FileExt == nil {
+	if c.FileExt == nil || *c.FileExt == "" {
 		return fmt.Sprintf("%s", basePath)
 	}
 	return fmt.Sprintf("%s.%s", basePath, *c.FileExt)

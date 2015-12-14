@@ -227,6 +227,35 @@ func (s *S3ConfigSuite) TestGetFullPath() {
 	assert.Equal(s.T(), VALID_S3_CONFIG_FULL_PATH, fullPath)
 }
 
+func (s *S3ConfigSuite) TestGetFullPathWithEmptyFileExt() {
+	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
+	region := VALID_S3_CONFIG_REGION
+	fileExt := ""
+
+	c := &S3Config{
+		BaseBucket: &baseBucket,
+		Region:     &region,
+		FileExt:    &fileExt,
+	}
+
+	fullPath := c.GetFullPath(VALID_S3_CONFIG_TEST_PATH)
+	assert.Equal(s.T(), VALID_S3_CONFIG_TEST_PATH, fullPath)
+}
+
+func (s *S3ConfigSuite) TestGetFullPathWithNilFileExt() {
+	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
+	region := VALID_S3_CONFIG_REGION
+
+	c := &S3Config{
+		BaseBucket: &baseBucket,
+		Region:     &region,
+		FileExt:    nil,
+	}
+
+	fullPath := c.GetFullPath(VALID_S3_CONFIG_TEST_PATH)
+	assert.Equal(s.T(), VALID_S3_CONFIG_TEST_PATH, fullPath)
+}
+
 func (s *S3ConfigSuite) TestGetRegion() {
 	baseBucket := VALID_S3_CONFIG_BASE_BUCKET
 	region := VALID_S3_CONFIG_REGION
