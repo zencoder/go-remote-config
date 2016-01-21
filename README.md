@@ -12,7 +12,7 @@ A Go library for configuration management with JSON files in remote storage.
 
 ## Dependencies
 
-This library vendors its dependencies. It is tested on go 1.5.1
+Using the new Go [vendor semantics](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit#!) with the vendor dir being managed by [Glide](https://github.com/Masterminds/glide). After checkout, initialise the vendor directory by running `glide install`. Dependency changes should be managed by editing the `glide.yaml` file and using glide to rebuild the vendor directory.
 
 Note that it uses a tag of aws-sdk-go, and a fork of testify. IE:
 
