@@ -16,7 +16,7 @@ dependencies:
     - sudo tar -xzf /tmp/go/go1.5.1.linux-amd64.tar.gz -C /usr/local
     - wget 'https://github.com/Masterminds/glide/releases/download/0.8.3/glide-0.8.3-linux-amd64.tar.gz' -O /tmp/go/glide-0.8.3-linux-amd64.tar.gz
     - tar -xzf /tmp/go/glide-0.8.3-linux-amd64.tar.gz -C /tmp/go
-    - sudo cp /tmp/go/linux-amd64/glide /usr/local/bin/glid
+    - sudo cp /tmp/go/linux-amd64/glide /usr/local/bin/glide
   override:
     - go get golang.org/x/tools/cmd/cover
     - go get github.com/mattn/goveralls
