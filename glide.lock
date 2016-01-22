@@ -1,8 +1,8 @@
-hash: 7662193196be72492dc5e4394da242782790e47a1160fbf0e9ec7a53ac9a7a78
-updated: 2016-01-21T15:47:09.020783102Z
+hash: b818339a0813fd74dab43c41a9b509a989eec5806e13083d28d9fbf05f4c7c63
+updated: 2016-01-21T16:22:08.693964745Z
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: f28e73d4791500a90d49190e0a01b769748cc2a8
+  version: c4c1a1a2a076858fe18b2be674d833c796c45b09
   subpackages:
   - aws
   - internal/endpoints
@@ -12,6 +12,10 @@ imports:
   - internal/protocol/xml/xmlutil
   - internal/signer/v4
   - service/s3
+- name: github.com/go-ini/ini
+  version: afbd495e5aaea13597b5e14fe514ddeaa4d76fc3
+- name: github.com/jmespath/go-jmespath
+  version: c01cf91b011868172fdcd9f41838e80c9d716264
 - name: github.com/lsegal/gucumber
   version: 44a4d7eb3b14a88cf82b073dfb7e06277afdc549
 - name: github.com/shiena/ansicolor
@@ -28,7 +32,6 @@ imports:
   version: a98ad7ee00ec53921f08832bc06ecf7fd600e6a1
 - name: golang.org/x/crypto
   version: 3760e016850398b85094c4c99e955b8c3dea5711
-  repo: https://golang.org/x/crypto
 - name: golang.org/x/net
   version: b2ed34f6fc8d65cc6a090fb87692ea6b1162fddd
 - name: golang.org/x/text
