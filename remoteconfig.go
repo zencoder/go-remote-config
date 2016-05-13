@@ -3,6 +3,7 @@ package remoteconfig
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"reflect"
 	"strings"
@@ -20,39 +21,30 @@ type Validater interface {
 // Downloads a configuration JSON file from S3.
 // Parses it to a particular struct type and runs a validation.
 // URL should be of the format s3://bucket/path/file.json
-func LoadConfigFromS3(configURL string, configRegion AWSRegion, configEndpoint string, configStruct interface{}) error {
-	// Build a Signed URL to the config file in S3
-	signedURL, err := BuildSignedS3URL(configURL, configRegion, DEFAULT_S3_EXPIRY, configEndpoint)
-	if err != nil {
-		return err
-	}
-
-	return DownloadJSONValidate(signedURL, configStruct)
-}
-
-// Downloads JSON from a URL, decodes it and then validates.
-func DownloadJSONValidate(signedURL string, configStruct interface{}) error {
-	// Download the config file from S3
-	resp, err := http.Get(signedURL)
+func LoadConfigFromURL(configURL string, configStruct interface{}) error {
+	resp, err := http.Get(configURL)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	// Check that we got a valid response code
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Download of JSON failed, URL = %s, Response Code = %d", signedURL, resp.StatusCode)
+		return fmt.Errorf("Request to '%s' returned non-200 OK status '%d: %s'", configURL, resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
+	return ReadJSONValidate(resp.Body, configStruct)
+}
+
+// Downloads JSON from a URL, decodes it and then validates.
+func ReadJSONValidate(cfgReader io.Reader, configStruct interface{}) error {
 	// Do a streaming JSON decode
-	dec := json.NewDecoder(resp.Body)
-	if err = dec.Decode(configStruct); err != nil {
+	dec := json.NewDecoder(cfgReader)
+	if err := dec.Decode(configStruct); err != nil {
 		return fmt.Errorf("Failed to decode JSON, with error, %s", err.Error())
 	}
 
 	// Run validation on the config
-	err = validateConfigWithReflection(configStruct)
-	if err != nil {
+	if err := validateConfigWithReflection(configStruct); err != nil {
 		return err
 	}
 
