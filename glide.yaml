@@ -1,7 +1,7 @@
 package: github.com/zencoder/go-remote-config
 import:
 - package: github.com/aws/aws-sdk-go
-  version: v1.0.9 
+  version: v1.0.9
   subpackages:
   - aws
   - internal/endpoints
