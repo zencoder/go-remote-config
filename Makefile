@@ -13,6 +13,9 @@ build:
 	go build -v -o bin/go-remote-config
 fmt:
 	go fmt ./...
+
+test: export AWS_ACCESS_KEY_ID := 1
+test: export AWS_SECRET_ACCESS_KEY := 1
 test:
 	if [ ! -d coverage ]; then mkdir coverage; fi
 	go test -v ./ -race -cover -coverprofile=$(COVERAGEDIR)/remoteconfig.coverprofile
