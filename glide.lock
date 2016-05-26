@@ -1,41 +1,10 @@
-hash: b818339a0813fd74dab43c41a9b509a989eec5806e13083d28d9fbf05f4c7c63
-updated: 2016-01-21T16:22:08.693964745Z
+hash: 17a0d16bb0830ed4e0aba565901f03075a9fb254605ed9ddb90e4357032186ca
+updated: 2016-05-26T14:05:08.186222748+01:00
 imports:
-- name: github.com/aws/aws-sdk-go
-  version: c4c1a1a2a076858fe18b2be674d833c796c45b09
-  subpackages:
-  - aws
-  - internal/endpoints
-  - internal/protocol/query
-  - internal/protocol/rest
-  - internal/protocol/restxml
-  - internal/protocol/xml/xmlutil
-  - internal/signer/v4
-  - service/s3
-- name: github.com/go-ini/ini
-  version: afbd495e5aaea13597b5e14fe514ddeaa4d76fc3
-- name: github.com/jmespath/go-jmespath
-  version: c01cf91b011868172fdcd9f41838e80c9d716264
-- name: github.com/lsegal/gucumber
-  version: 44a4d7eb3b14a88cf82b073dfb7e06277afdc549
-- name: github.com/shiena/ansicolor
-  version: a422bbe96644373c5753384a59d678f7d261ff10
-- name: github.com/stretchr/objx
-  version: 1a9d0bb9f541897e62256577b352fdbc1fb4fd94
 - name: github.com/stretchr/testify
   version: c478a808a1b37e10c82f71a2172728f8742bad51
   subpackages:
   - assert
   - require
   - suite
-- name: github.com/vaughan0/go-ini
-  version: a98ad7ee00ec53921f08832bc06ecf7fd600e6a1
-- name: golang.org/x/crypto
-  version: 3760e016850398b85094c4c99e955b8c3dea5711
-- name: golang.org/x/net
-  version: b2ed34f6fc8d65cc6a090fb87692ea6b1162fddd
-- name: golang.org/x/text
-  version: cf4986612c83df6c55578ba198316d1684a9a287
-- name: golang.org/x/tools
-  version: 7912bef4df2a5e800f88a0142017ed59d1c64ea4
 devImports: []

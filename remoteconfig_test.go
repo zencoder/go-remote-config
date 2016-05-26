@@ -7,6 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"bytes"
+
+	"regexp"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -56,13 +60,13 @@ func (s *RemoteConfigSuite) SetupSuite() {
 func (s *RemoteConfigSuite) SetupTest() {
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflection() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflection() {
 	c := s.buildValidSampleConfig()
 	err := validateConfigWithReflection(c)
 	s.Nil(err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionWithOptional() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionWithOptional() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -117,7 +121,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionWithOptional() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSQueueConfigNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorSQSQueueConfigNotSet() {
 	c := &SampleConfig{
 		SQSQueue: nil,
 	}
@@ -126,7 +130,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSQueueConfigN
 	assert.Equal(s.T(), errors.New("Field: SQSQueue, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSClientConfigNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorSQSClientConfigNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -144,7 +148,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSClientConfig
 	assert.Equal(s.T(), errors.New("Field: SQSClient, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSQueueConfigValidate() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorSQSQueueConfigValidate() {
 	sqsRegion := AWSRegion("invalidregion")
 	sqsQueue := &SQSQueueConfig{
 		Region: &sqsRegion,
@@ -157,7 +161,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorSQSQueueConfigV
 	assert.Equal(s.T(), errors.New("Sub Field of SQSQueue, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBTableConfigNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBTableConfigNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -181,7 +185,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBTableCo
 	assert.Equal(s.T(), errors.New("Field: DynamoDBTable, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBClientConfigNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBClientConfigNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -211,7 +215,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBClientC
 	assert.Equal(s.T(), errors.New("Field: DynamoDBClient, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBClientConfigValidate() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBClientConfigValidate() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -246,7 +250,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBClientC
 	assert.Equal(s.T(), errors.New("Sub Field of DynamoDBClient, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBTableConfigValidate() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBTableConfigValidate() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -275,7 +279,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorDynamoDBTableCo
 	assert.Equal(s.T(), errors.New("Sub Field of DynamoDBTable, failed to validate with error, String Field: TableName, contains an empty string"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStrNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -311,7 +315,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrNotSet() {
 	assert.Equal(s.T(), errors.New("Field: Str, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStrEmpty() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -349,7 +353,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStrEmpty() {
 	assert.Equal(s.T(), errors.New("String Field: Str, contains an empty string"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -388,7 +392,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigNo
 	assert.Equal(s.T(), errors.New("Field: StorageConfig, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceNotSet() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigSliceNotSet() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -435,7 +439,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSl
 	assert.Equal(s.T(), errors.New("Field: StorageConfigSlice, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceNested() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigSliceNested() {
 	c := s.buildValidSampleConfig()
 	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
 	invalidStorageLocation := StorageLocation("")
@@ -451,7 +455,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSl
 	s.Equal(errors.New("Validater Field: StorageConfig, failed to validate with error, Region cannot be empty"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigMapNested() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigMapNested() {
 	c := s.buildValidSampleConfig()
 	storageProvider := VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER
 	invalidStorageLocation := StorageLocation("")
@@ -467,7 +471,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigMa
 	s.Equal(errors.New("Sub field of StorageConfigMap with key 'one' failed to validated with error, Validater Field: StorageConfig, failed to validate with error, Region cannot be empty"), err)
 }
 
-func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSliceEmpty() {
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigSliceEmpty() {
 	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
 	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
 	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
@@ -514,14 +518,7 @@ func (s *RemoteConfigSuite) TestvalidateConfigWithReflectionErrorStorageConfigSl
 	assert.Equal(s.T(), errors.New("Slice Field: StorageConfigSlice, is empty"), err)
 }
 
-func (s *RemoteConfigSuite) TestLoadConfigFromS3Error() {
-	c := &SQSQueueConfig{}
-	err := LoadConfigFromS3("invalid", AWSRegion("invalid"), VALID_REMOTE_CONFIG_NO_ENDPOINT, c)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("S3 URL does not start with the s3:// scheme"), err)
-}
-
-func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
+func (s *RemoteConfigSuite) TestLoadConfigFromURL_Gold() {
 	configJSON := `
 	{
 		"sqs_client" : {
@@ -569,42 +566,108 @@ func (s *RemoteConfigSuite) TestdownloadJSONValidate() {
 	defer ts.Close()
 
 	c := &SampleConfig{}
-	err := DownloadJSONValidate(ts.URL, c)
+	err := LoadConfigFromURL(ts.URL, c)
 	assert.Nil(s.T(), err)
 }
 
-func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorDownloadFailed() {
+func (s *RemoteConfigSuite) TestLoadConfigFromURL_NotOK() {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "JSON Download Failed", http.StatusNotFound)
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, "Not Found")
 	}))
 	defer ts.Close()
 
-	c := &SampleConfig{}
-	err := DownloadJSONValidate(ts.URL, c)
+	c := &SQSQueueConfig{}
+	err := LoadConfigFromURL(ts.URL, c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), fmt.Errorf("Download of JSON failed, URL = %s, Response Code = %d", ts.URL, http.StatusNotFound), err)
+	assert.Regexp(s.T(), regexp.MustCompile("Request to 'http://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{1,5}' returned non-200 OK status '404: Not Found'"), err.Error())
 }
 
-func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorValidation() {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{}`)
-	}))
-	defer ts.Close()
+func (s *RemoteConfigSuite) TestLoadConfigFromURLError() {
+	c := &SQSQueueConfig{}
+	err := LoadConfigFromURL("invalid", c)
+	assert.NotNil(s.T(), err)
+	assert.EqualError(s.T(), err, "Get invalid: unsupported protocol scheme \"\"")
+}
+
+func (s *RemoteConfigSuite) TestReadJSONValidate() {
+	configJSON := `
+	{
+		"sqs_client" : {
+			"region" : "us-east-1",
+			"endpoint" : "http://localhost:3000/sqs"
+		},
+		"sqs_queue" : {
+			"region" : "us-east-1",
+			"aws_account_id" : "345833302425",
+			"queue_name" : "testQueue"
+		},
+		"dynamodb_client" : {
+			"region" : "us-east-1",
+			"endpoint" : "http://localhost:8000/dynamodb"
+		},
+		"dynamodb_table" : {
+			"table_name" : "testTable"
+		},
+		"str" : "testStr",
+		"storage_config" : {
+			"provider" : "aws",
+			"location" : "us-west-2"
+		},
+		"storage_config_slice" : [{
+			"provider" : "aws",
+			"location" : "us-west-2"
+		},
+		{
+			"provider" : "aws",
+			"location" : "us-east-1"
+		}],
+		"storage_config_map": {
+			"one": {
+				"provider": "aws",
+				"location": "us-west-2"
+			}
+		},
+		"str_slice": [ "hello" ],
+		"map_str_str": { "key": "value" }
+	}`
+
+	cfgBuffer := bytes.NewBufferString(configJSON)
 
 	c := &SampleConfig{}
-	err := DownloadJSONValidate(ts.URL, c)
+	err := ReadJSONValidate(cfgBuffer, c)
+	assert.Nil(s.T(), err)
+}
+
+func (s *RemoteConfigSuite) TestReadJSONValidateInvalidJSON() {
+	cfgBuffer := bytes.NewBufferString("Not JSON")
+
+	c := &SampleConfig{}
+	err := ReadJSONValidate(cfgBuffer, c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("Failed to decode JSON, with error, invalid character 'N' looking for beginning of value"), err)
+}
+
+func (s *RemoteConfigSuite) TestReadJSONValidateErrorValidation() {
+	cfgBuffer := bytes.NewBufferString("{}")
+
+	c := &SampleConfig{}
+	err := ReadJSONValidate(cfgBuffer, c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Field: SQSQueue, not set"), err)
 }
 
-func (s *RemoteConfigSuite) TestdownloadJSONValidateErrorInvalidJSON() {
+func (s *RemoteConfigSuite) TestReadJSONValidateErrorInvalidJSON() {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "This is NOT JSON")
 	}))
 	defer ts.Close()
 
+	resp, _ := http.Get(ts.URL)
+	defer resp.Body.Close()
+
 	c := &SampleConfig{}
-	err := DownloadJSONValidate(ts.URL, c)
+	err := ReadJSONValidate(resp.Body, c)
 
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Failed to decode JSON, with error, invalid character 'T' looking for beginning of value"), err)
