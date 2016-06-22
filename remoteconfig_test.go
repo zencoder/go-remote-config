@@ -1,19 +1,17 @@
 package remoteconfig
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-
-	"bytes"
-
 	"regexp"
+	"strings"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"strings"
 )
 
 const (
