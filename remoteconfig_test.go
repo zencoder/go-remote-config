@@ -605,7 +605,9 @@ func (s *RemoteConfigSuite) TestReadJSONParseEmbeddedStruct() {
 	err := ReadJSONValidate(cfgBuffer, c)
 	assert.Nil(s.T(), err)
 	assert.NotNil(s.T(), c.EmbeddedStr)
+	assert.NotNil(s.T(), c.EmbeddedInt)
 	assert.EqualValues(s.T(), "abc", *c.EmbeddedStr)
+	assert.EqualValues(s.T(), 123, *c.EmbeddedInt)
 }
 
 func (s *RemoteConfigSuite) TestReadJSONValidateEmbeddedStruct() {
