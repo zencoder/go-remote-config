@@ -74,6 +74,10 @@ func validateConfigWithReflection(c interface{}) error {
 		tags := typeField.Tag.Get("remoteconfig")
 		optional := strings.Contains(tags, "optional")
 
+		if valueField.Kind() == reflect.Struct && typeField.Anonymous {
+			continue
+		}
+
 		if valueField.IsNil() && !optional {
 			return fmt.Errorf("Field: %s, not set", typeField.Name)
 		} else if valueField.IsNil() && optional {

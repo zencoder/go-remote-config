@@ -1,15 +1,14 @@
 package remoteconfig
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-
-	"bytes"
-
 	"regexp"
+	"strings"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -21,7 +20,6 @@ const (
 	VALID_REMOTE_CONFIG_SQS_QUEUE_NAME          string          = "testQueue"
 	VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION  AWSRegion       = AWS_REGION_US_EAST_1
 	VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME     string          = "testTable"
-	VALID_REMOTE_CONFIG_NO_ENDPOINT             string          = ""
 	VALID_REMOTE_CONFIG_STORAGE_CONFIG_PROVIDER StorageProvider = STORAGE_PROVIDER_AWS
 	VALID_REMOTE_CONFIG_STORAGE_CONFIG_LOCATION StorageLocation = (StorageLocation)(AWS_REGION_US_WEST_2)
 )
@@ -34,7 +32,13 @@ func TestRemoteConfigSuite(t *testing.T) {
 	suite.Run(t, new(RemoteConfigSuite))
 }
 
+type EmbeddedConfig struct {
+	EmbeddedStr *string `json:"embedded_string,omitempty"`
+	EmbeddedInt *int64  `json:"embedded_int,omitempty"`
+}
+
 type SampleConfig struct {
+	EmbeddedConfig
 	SQSQueueOptional           *SQSQueueConfig           `json:"sqs_queue_optional,omitempty" remoteconfig:"optional"`
 	SQSClientOptional          *SQSClientConfig          `json:"sqs_client_optional,omitempty" remoteconfig:"optional"`
 	DynamoDBTableOptional      *DynamoDBTableConfig      `json:"dynamodb_table_optional,omitempty" remoteconfig:"optional"`
@@ -54,11 +58,48 @@ type SampleConfig struct {
 	MapStrStr                  map[string]*string        `json:"map_str_str,omitempty"`
 }
 
-func (s *RemoteConfigSuite) SetupSuite() {
-}
-
-func (s *RemoteConfigSuite) SetupTest() {
-}
+var validConfigJSON = `
+	{
+		"embedded_string": "abc",
+		"embedded_int": 123,
+		"sqs_client" : {
+			"region" : "us-east-1",
+			"endpoint" : "http://localhost:3000/sqs"
+		},
+		"sqs_queue" : {
+			"region" : "us-east-1",
+			"aws_account_id" : "345833302425",
+			"queue_name" : "testQueue"
+		},
+		"dynamodb_client" : {
+			"region" : "us-east-1",
+			"endpoint" : "http://localhost:8000/dynamodb"
+		},
+		"dynamodb_table" : {
+			"table_name" : "testTable"
+		},
+		"str" : "testStr",
+		"storage_config" : {
+			"provider" : "aws",
+			"location" : "us-west-2"
+		},
+		"storage_config_slice" : [{
+			"provider" : "aws",
+			"location" : "us-west-2"
+		},
+		{
+			"provider" : "aws",
+			"location" : "us-east-1"
+		}],
+		"storage_config_map": {
+			"one": {
+				"provider": "aws",
+				"location": "us-west-2"
+			}
+		},
+		"str_slice": [ "hello" ],
+		"map_str_str": { "key": "value" }
+	}`
 
 func (s *RemoteConfigSuite) TestValidateConfigWithReflection() {
 	c := s.buildValidSampleConfig()
@@ -519,49 +560,8 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigSl
 }
 
 func (s *RemoteConfigSuite) TestLoadConfigFromURL_Gold() {
-	configJSON := `
-	{
-		"sqs_client" : {
-			"region" : "us-east-1",
-			"endpoint" : "http://localhost:3000/sqs"
-		},
-		"sqs_queue" : {
-			"region" : "us-east-1",
-			"aws_account_id" : "345833302425",
-			"queue_name" : "testQueue"
-		},
-		"dynamodb_client" : {
-			"region" : "us-east-1",
-			"endpoint" : "http://localhost:8000/dynamodb"
-		},
-		"dynamodb_table" : {
-			"table_name" : "testTable"
-		},
-		"str" : "testStr",
-		"storage_config" : {
-			"provider" : "aws",
-			"location" : "us-west-2"
-		},
-		"storage_config_slice" : [{
-			"provider" : "aws",
-			"location" : "us-west-2"
-		},
-		{
-			"provider" : "aws",
-			"location" : "us-east-1"
-		}],
-		"storage_config_map": {
-			"one": {
-				"provider": "aws",
-				"location": "us-west-2"
-			}
-		},
-		"str_slice": [ "hello" ],
-		"map_str_str": { "key": "value" }
-	}`
-
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, configJSON)
+		fmt.Fprintln(w, validConfigJSON)
 	}))
 	defer ts.Close()
 
@@ -591,52 +591,32 @@ func (s *RemoteConfigSuite) TestLoadConfigFromURLError() {
 }
 
 func (s *RemoteConfigSuite) TestReadJSONValidate() {
-	configJSON := `
-	{
-		"sqs_client" : {
-			"region" : "us-east-1",
-			"endpoint" : "http://localhost:3000/sqs"
-		},
-		"sqs_queue" : {
-			"region" : "us-east-1",
-			"aws_account_id" : "345833302425",
-			"queue_name" : "testQueue"
-		},
-		"dynamodb_client" : {
-			"region" : "us-east-1",
-			"endpoint" : "http://localhost:8000/dynamodb"
-		},
-		"dynamodb_table" : {
-			"table_name" : "testTable"
-		},
-		"str" : "testStr",
-		"storage_config" : {
-			"provider" : "aws",
-			"location" : "us-west-2"
-		},
-		"storage_config_slice" : [{
-			"provider" : "aws",
-			"location" : "us-west-2"
-		},
-		{
-			"provider" : "aws",
-			"location" : "us-east-1"
-		}],
-		"storage_config_map": {
-			"one": {
-				"provider": "aws",
-				"location": "us-west-2"
-			}
-		},
-		"str_slice": [ "hello" ],
-		"map_str_str": { "key": "value" }
-	}`
-
-	cfgBuffer := bytes.NewBufferString(configJSON)
+	cfgBuffer := bytes.NewBufferString(validConfigJSON)
 
 	c := &SampleConfig{}
 	err := ReadJSONValidate(cfgBuffer, c)
 	assert.Nil(s.T(), err)
+}
+
+func (s *RemoteConfigSuite) TestReadJSONParseEmbeddedStruct() {
+	cfgBuffer := bytes.NewBufferString(validConfigJSON)
+
+	c := &SampleConfig{}
+	err := ReadJSONValidate(cfgBuffer, c)
+	assert.Nil(s.T(), err)
+	assert.NotNil(s.T(), c.EmbeddedStr)
+	assert.NotNil(s.T(), c.EmbeddedInt)
+	assert.EqualValues(s.T(), "abc", *c.EmbeddedStr)
+	assert.EqualValues(s.T(), 123, *c.EmbeddedInt)
+}
+
+func (s *RemoteConfigSuite) TestReadJSONValidateEmbeddedStruct() {
+	invalidConfigJSON := strings.Replace(validConfigJSON, `"embedded_int": 123`, `"embedded_int": "123"`, 1)
+	cfgBuffer := bytes.NewBufferString(invalidConfigJSON)
+
+	c := &SampleConfig{}
+	err := ReadJSONValidate(cfgBuffer, c)
+	assert.EqualError(s.T(), err, "Failed to decode JSON, with error, json: cannot unmarshal string into Go value of type int64")
 }
 
 func (s *RemoteConfigSuite) TestReadJSONValidateInvalidJSON() {
