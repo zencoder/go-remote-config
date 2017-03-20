@@ -616,7 +616,8 @@ func (s *RemoteConfigSuite) TestReadJSONValidateEmbeddedStruct() {
 
 	c := &SampleConfig{}
 	err := ReadJSONValidate(cfgBuffer, c)
-	assert.EqualError(s.T(), err, "Failed to decode JSON, with error, json: cannot unmarshal string into Go value of type int64")
+	assert.Error(s.T(), err)
+	assert.Contains(s.T(), err.Error(), "Failed to decode JSON")
 }
 
 func (s *RemoteConfigSuite) TestReadJSONValidateInvalidJSON() {
