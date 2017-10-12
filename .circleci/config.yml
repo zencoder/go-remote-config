@@ -9,7 +9,7 @@ containerInfo:
       GLIDE_VERSION: 0.12.3
 jobs:
   build:
-    workdir: "/go/src/github.com/zencoder/go-dash"
+    workdir: "/go/src/github.com/zencoder/go-remote-config"
     steps:
       - checkout
       - run:
