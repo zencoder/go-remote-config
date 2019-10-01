@@ -1,33 +1,36 @@
-COVERAGEDIR = coverage
-ifdef CIRCLE_ARTIFACTS
-  COVERAGEDIR = $(CIRCLE_ARTIFACTS)
-endif
+# Force-enable Go modules even if this project has been cloned within a user's GOPATH
+export GO111MODULE = on
 
+# Specify VERBOSE=1 to get verbose output from all executed commands
 ifdef VERBOSE
 V = -v
+X = -x
 else
 .SILENT:
 endif
 
-install-deps:
-	glide install
+.PHONY: all
+all: build test
+
+.PHONY: clean
+clean:
+	rm -rf bin/ coverage/ cucumber/logs/
+	go clean -i $(X) -cache -testcache
+
+.PHONY: build
 build:
 	mkdir -p bin
-	go build $(V) -o bin/go-remote-config
-fmt:
-	go fmt ./...
+	go build $(V) -o bin/gokay
 
-test: export AWS_ACCESS_KEY_ID := 1
-test: export AWS_SECRET_ACCESS_KEY := 1
+.PHONY: fmt
+fmt:
+	go fmt $(X) ./...
+
+.PHONY: test
 test:
 	mkdir -p coverage
-	go test $(V) ./ -race -cover -coverprofile=$(COVERAGEDIR)/remoteconfig.coverprofile
+	go test $(V) -race -cover -coverprofile coverage/cover.profile ./...
+
+.PHONY: cover
 cover:
-	go tool cover -html=$(COVERAGEDIR)/remoteconfig.coverprofile -o $(COVERAGEDIR)/remoteconfig.html
-coveralls:
-	gover $(COVERAGEDIR) $(COVERAGEDIR)/coveralls.coverprofile
-	goveralls -coverprofile=$(COVERAGEDIR)/coveralls.coverprofile -service=circle-ci -repotoken=$(COVERALLS_TOKEN)
-clean:
-	go clean
-	rm -f bin/go-remote-config
-	rm -rf coverage/
+	go tool cover -html coverage/cover.profile

@@ -1,8 +1,0 @@
-package: github.com/zencoder/go-remote-config
-import:
-- package: github.com/stretchr/testify
-  version: c478a808a1b37e10c82f71a2172728f8742bad51
-  subpackages:
-  - assert
-  - require
-  - suite
