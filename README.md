@@ -2,24 +2,12 @@
 
 [![godoc](https://godoc.org/github.com/zencoder/go-remote-config?status.svg)](http://godoc.org/github.com/zencoder/go-remote-config)
 [![Circle CI](https://circleci.com/gh/zencoder/go-remote-config.svg?style=svg)](https://circleci.com/gh/zencoder/go-remote-config)
-[![Coverage Status](https://coveralls.io/repos/zencoder/go-remote-config/badge.svg?branch=master&t=VFcsMv)](https://coveralls.io/r/zencoder/go-remote-config?branch=master)
 
 A Go library for configuration management with JSON files in remote storage.
 
 ## Install
 
 	go get github.com/zencoder/go-remote-config
-
-## Dependencies
-
-Using the new Go [vendor semantics](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo/edit#!) with the vendor dir being managed by [Glide](https://github.com/Masterminds/glide). After checkout, initialise the vendor directory by running `glide install`. Dependency changes should be managed by editing the `glide.yaml` file and using glide to rebuild the vendor directory.
-
-Note that it uses a tag of aws-sdk-go, and a fork of testify. IE:
-
-        cd $GOPATH/src/github.com/stretchr/
-        rm -rf testify
-        git clone github.com/juliancooper/testify
-
 
 ## Supported Storage Providers
 

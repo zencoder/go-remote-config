@@ -20,7 +20,7 @@ clean:
 .PHONY: build
 build:
 	mkdir -p bin
-	go build $(V) -o bin/gokay
+	go build $(V) -o bin/go-remote-config
 
 .PHONY: fmt
 fmt:
