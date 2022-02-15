@@ -587,7 +587,7 @@ func (s *RemoteConfigSuite) TestLoadConfigFromURLError() {
 	c := &SQSQueueConfig{}
 	err := LoadConfigFromURL("invalid", c)
 	assert.NotNil(s.T(), err)
-	assert.EqualError(s.T(), err, "Get invalid: unsupported protocol scheme \"\"")
+	assert.EqualError(s.T(), err, "Get \"invalid\": unsupported protocol scheme \"\"")
 }
 
 func (s *RemoteConfigSuite) TestReadJSONValidate() {
