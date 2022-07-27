@@ -5,8 +5,8 @@ const (
 )
 
 type S3EndpointExpiryConfig struct {
-	Endpoint *string `json:"endpoint,omitempty" remoteconfig:"optional"`
-	Expiry   *uint   `json:"expiry,omitempty" remoteconfig:"optional"`
+	Endpoint *string `json:"endpoint,omitempty" yaml:"endpoint,omitempty" remoteconfig:"optional"`
+	Expiry   *uint   `json:"expiry,omitempty" yaml:"expiry,omitempty" remoteconfig:"optional"`
 }
 
 func (c S3EndpointExpiryConfig) GetEndpoint() string {
