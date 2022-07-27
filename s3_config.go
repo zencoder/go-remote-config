@@ -10,10 +10,10 @@ const (
 )
 
 type S3Config struct {
-	Endpoint *string    `json:"endpoint,omitempty" remoteconfig:"optional"`
-	Bucket   *string    `json:"bucket,omitempty"`                         // i.e. bucket
-	Region   *AWSRegion `json:"region,omitempty"`                         // i.e. us-west-2
-	Expiry   *uint      `json:"expiry,omitempty" remoteconfig:"optional"` // i.e. 60
+	Endpoint *string    `json:"endpoint,omitempty" yaml:"endpoint,omitempty" remoteconfig:"optional"`
+	Bucket   *string    `json:"bucket,omitempty" yaml:"bucket,omitempty"`                         // i.e. bucket
+	Region   *AWSRegion `json:"region,omitempty" yaml:"region,omitempty"`                         // i.e. us-west-2
+	Expiry   *uint      `json:"expiry,omitempty" yaml:"expiry,omitempty" remoteconfig:"optional"` // i.e. 60
 }
 
 func (c S3Config) GetEndpoint() string {
