@@ -50,7 +50,8 @@ type SampleConfig struct {
 	SQSClient                  *SQSClientConfig          `json:"sqs_client,omitempty"`
 	DynamoDBTable              *DynamoDBTableConfig      `json:"dynamodb_table,omitempty"`
 	DynamoDBClient             *DynamoDBClientConfig     `json:"dynamodb_client,omitempty"`
-	Str                        *string                   `json:"str,omitempty"`
+	Str                        string                    `json:"str,omitempty"`
+	StrPointer                 *string                   `json:"str_pointer,omitempty"`
 	StorageConfig              *StorageConfig            `json:"storage_config,omitempty"`
 	StorageConfigSlice         []*StorageConfig          `json:"storage_config_slice,omitempty"`
 	StorageConfigMap           map[string]*StorageConfig `json:"storage_config_map,omitempty"`
@@ -79,6 +80,7 @@ var validConfigJSON = `
 			"table_name" : "testTable"
 		},
 		"str" : "testStr",
+		"str_pointer" : "testStr",
 		"storage_config" : {
 			"provider" : "aws",
 			"location" : "us-west-2"
@@ -151,7 +153,8 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionWithOptional() {
 		SQSClient:                  sqsClient,
 		DynamoDBTable:              dynamodbTable,
 		DynamoDBClient:             dynamodbClient,
-		Str:                        &str,
+		Str:                        str,
+		StrPointer:                 &str,
 		StorageConfig:              storageConfig,
 		StorageConfigSlice:         []*StorageConfig{storageConfig},
 		StorageConfigMap:           map[string]*StorageConfig{"one": storageConfig},
@@ -348,12 +351,52 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStrNotSet() {
 		SQSClient:      sqsClient,
 		DynamoDBTable:  dynamodbTable,
 		DynamoDBClient: dynamodbClient,
-		Str:            nil,
+		Str:            "testString",
+		StrPointer:     nil,
 	}
 
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Field: Str, not set"), err)
+	assert.Equal(s.T(), errors.New("Field: StrPointer, not set"), err)
+}
+
+func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStrPointerEmpty() {
+	sqsRegion := VALID_REMOTE_CONFIG_SQS_REGION
+	sqsAWSAccountID := VALID_REMOTE_CONFIG_SQS_AWS_ACCOUNT_ID
+	sqsQueueName := VALID_REMOTE_CONFIG_SQS_QUEUE_NAME
+	sqsQueue := &SQSQueueConfig{
+		Region:       &sqsRegion,
+		AWSAccountID: &sqsAWSAccountID,
+		QueueName:    &sqsQueueName,
+	}
+	sqsClient := &SQSClientConfig{
+		Region: &sqsRegion,
+	}
+
+	dynamodbTableName := VALID_REMOTE_CONFIG_DYNAMODB_TABLE_NAME
+	dynamodbTable := &DynamoDBTableConfig{
+		TableName: &dynamodbTableName,
+	}
+
+	dynamodbClientRegion := VALID_REMOTE_CONFIG_DYNAMODB_CLIENT_REGION
+	dynamodbClient := &DynamoDBClientConfig{
+		Region: &dynamodbClientRegion,
+	}
+
+	str := ""
+
+	c := &SampleConfig{
+		SQSQueue:       sqsQueue,
+		SQSClient:      sqsClient,
+		DynamoDBTable:  dynamodbTable,
+		DynamoDBClient: dynamodbClient,
+		Str:            "testString",
+		StrPointer:     &str,
+	}
+
+	err := validateConfigWithReflection(c)
+	assert.NotNil(s.T(), err)
+	assert.Equal(s.T(), errors.New("String Field: StrPointer, contains an empty string"), err)
 }
 
 func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStrEmpty() {
@@ -386,7 +429,7 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStrEmpty() {
 		SQSClient:      sqsClient,
 		DynamoDBTable:  dynamodbTable,
 		DynamoDBClient: dynamodbClient,
-		Str:            &str,
+		Str:            str,
 	}
 
 	err := validateConfigWithReflection(c)
@@ -424,7 +467,8 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigNo
 		SQSClient:      sqsClient,
 		DynamoDBTable:  dynamodbTable,
 		DynamoDBClient: dynamodbClient,
-		Str:            &str,
+		Str:            str,
+		StrPointer:     &str,
 		StorageConfig:  nil,
 	}
 
@@ -470,7 +514,8 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigSl
 		SQSClient:          sqsClient,
 		DynamoDBTable:      dynamodbTable,
 		DynamoDBClient:     dynamodbClient,
-		Str:                &str,
+		Str:                str,
+		StrPointer:         &str,
 		StorageConfig:      storageConfig,
 		StorageConfigSlice: nil,
 	}
@@ -549,7 +594,8 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorStorageConfigSl
 		SQSClient:          sqsClient,
 		DynamoDBTable:      dynamodbTable,
 		DynamoDBClient:     dynamodbClient,
-		Str:                &str,
+		Str:                str,
+		StrPointer:         &str,
 		StorageConfig:      storageConfig,
 		StorageConfigSlice: []*StorageConfig{},
 	}
@@ -691,7 +737,8 @@ func (s *RemoteConfigSuite) buildValidSampleConfig() *SampleConfig {
 		SQSClient:          sqsClient,
 		DynamoDBTable:      dynamodbTable,
 		DynamoDBClient:     dynamodbClient,
-		Str:                &str,
+		Str:                str,
+		StrPointer:         &str,
 		StorageConfig:      storageConfig,
 		StorageConfigSlice: []*StorageConfig{storageConfig},
 		StorageConfigMap:   map[string]*StorageConfig{"one": storageConfig},
