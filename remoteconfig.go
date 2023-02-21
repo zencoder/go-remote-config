@@ -51,6 +51,15 @@ func ReadJSONValidate(cfgReader io.Reader, configStruct interface{}) error {
 	return nil
 }
 
+func isNilFixed(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
+		//use of IsNil method
+		return v.IsNil()
+	}
+	return false
+}
+
 // Validates a configuration struct.
 // Uses reflection to determine and call the correct Validation methods for each type.
 func validateConfigWithReflection(c interface{}) error {
@@ -78,9 +87,9 @@ func validateConfigWithReflection(c interface{}) error {
 			continue
 		}
 
-		if valueField.IsNil() && !optional {
+		if isNilFixed(valueField) && !optional {
 			return fmt.Errorf("Field: %s, not set", typeField.Name)
-		} else if valueField.IsNil() && optional {
+		} else if isNilFixed(valueField) && optional {
 			continue
 		}
 
@@ -115,9 +124,17 @@ func validateConfigWithReflection(c interface{}) error {
 			continue
 		}
 
-		// If this is a string field, check that it isn't empty (unless optional)
+		// If this is a string pointer field, check that it isn't empty (unless optional)
 		if s, ok := valueField.Interface().(*string); ok {
 			if *s == "" {
+				return fmt.Errorf("String Field: %s, contains an empty string", typeField.Name)
+			}
+			continue
+		}
+
+		// If this is a string field, check that it isn't empty (unless optional)
+		if s, ok := valueField.Interface().(string); ok {
+			if s == "" {
 				return fmt.Errorf("String Field: %s, contains an empty string", typeField.Name)
 			}
 			continue
