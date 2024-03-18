@@ -124,6 +124,11 @@ func validateConfigWithReflection(c interface{}) error {
 			continue
 		}
 
+		// Skip functions
+		if valueField.Kind() == reflect.Func {
+			continue
+		}
+
 		// If this is a string pointer field, check that it isn't empty (unless optional)
 		if s, ok := valueField.Interface().(*string); ok {
 			if *s == "" {

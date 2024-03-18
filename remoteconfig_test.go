@@ -37,6 +37,11 @@ type EmbeddedConfig struct {
 	EmbeddedInt *int64  `json:"embedded_int,omitempty"`
 }
 
+type CacheConfig struct {
+	MaxEntries *int                      `json:"max_entries" remoteconfig:"optional"`
+	OnEvicted  func(string, interface{}) `json:"_" remoteconfig:"optional"`
+}
+
 type SampleConfig struct {
 	EmbeddedConfig
 	SQSQueueOptional           *SQSQueueConfig           `json:"sqs_queue_optional,omitempty" remoteconfig:"optional"`
@@ -682,6 +687,18 @@ func (s *RemoteConfigSuite) TestReadJSONValidateErrorValidation() {
 	err := ReadJSONValidate(cfgBuffer, c)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), errors.New("Field: SQSQueue, not set"), err)
+}
+
+func (s *RemoteConfigSuite) TestReadJSONValidateCache() {
+	cfgBuffer := bytes.NewBufferString("{\"max_entries\": 5}")
+
+	c := &CacheConfig{}
+
+	err := ReadJSONValidate(cfgBuffer, c)
+	assert.Nil(s.T(), err)
+	assert.Nil(s.T(), c.OnEvicted)
+	assert.NotNil(s.T(), c.MaxEntries)
+	assert.EqualValues(s.T(), 5, *c.MaxEntries)
 }
 
 func (s *RemoteConfigSuite) TestReadJSONValidateErrorInvalidJSON() {
