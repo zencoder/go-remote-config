@@ -53,8 +53,8 @@ func ReadJSONValidate(cfgReader io.Reader, configStruct interface{}) error {
 
 func isNilFixed(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Ptr, reflect.Map, reflect.Array, reflect.Chan, reflect.Slice:
-		//use of IsNil method
+	case reflect.Ptr, reflect.Map, reflect.Array, reflect.Chan, reflect.Slice, reflect.Func:
+		// use of IsNil method
 		return v.IsNil()
 	}
 	return false
