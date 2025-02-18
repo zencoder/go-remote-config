@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -642,6 +643,34 @@ func (s *RemoteConfigSuite) TestReadJSONValidate() {
 	c := &SampleConfig{}
 	err := ReadJSONValidate(cfgBuffer, c)
 	assert.Nil(s.T(), err)
+}
+
+func (s *RemoteConfigSuite) TestReadJSONValidateWithFunctionType() {
+	type ConfigWithFunc struct {
+		MaxEntries *int              `json:"max_entries" remoteconfig:"optional"`
+		OnEvicted  func(interface{}) `json:"_" remoteconfig:"optional"`
+	}
+
+	i := 5
+	tests := []struct {
+		name string
+		in   string
+		out  *ConfigWithFunc
+	}{
+		{name: "no config", in: `{}`},
+		{name: "empty config", in: `{"cfg": {}}`, out: &ConfigWithFunc{}},
+		{name: "values in config", in: `{"cfg": {"max_entries": 5}}`, out: &ConfigWithFunc{MaxEntries: &i}},
+	}
+
+	for _, test := range tests {
+		s.T().Run(test.name, func(t *testing.T) {
+			var found struct {
+				Cfg *ConfigWithFunc `json:"cfg" remoteconfig:"optional"`
+			}
+			require.NoError(t, ReadJSONValidate(strings.NewReader(test.in), &found))
+			assert.Equal(t, test.out, found.Cfg)
+		})
+	}
 }
 
 func (s *RemoteConfigSuite) TestReadJSONParseEmbeddedStruct() {
