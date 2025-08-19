@@ -64,7 +64,7 @@ func (s *SQSQueueConfigSuite) TestValidateErrorRegion() {
 
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error, Region is invalid"), err)
+	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error"), err)
 }
 
 func (s *SQSQueueConfigSuite) TestValidateErrorAWSAccountID() {

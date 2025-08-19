@@ -122,7 +122,7 @@ func (s *S3ConfigSuite) TestValidateErrorRegionInvalid() {
 
 	err := validateConfigWithReflection(c)
 	s.NotNil(err)
-	s.Equal(errors.New("Validater Field: Region, failed to validate with error, Region is invalid"), err)
+	s.Equal(errors.New("Validater Field: Region, failed to validate with error"), err)
 }
 
 func (s *S3ConfigSuite) TestGetEndpointNotSet() {
