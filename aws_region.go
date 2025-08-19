@@ -32,7 +32,6 @@ var AWSRegions = []AWSRegion{
 
 var (
 	ErrAWSRegionEmptyString = errors.New("Region cannot be empty")
-	ErrAWSRegionInvalid     = errors.New("Region is invalid")
 )
 
 func (r *AWSRegion) UnmarshalText(data []byte) error {
@@ -44,13 +43,6 @@ func (r *AWSRegion) UnmarshalText(data []byte) error {
 func (r AWSRegion) Validate() error {
 	if r == "" {
 		return ErrAWSRegionEmptyString
-	}
-
-	if r != AWS_REGION_US_EAST_1 && r != AWS_REGION_US_WEST_1 && r != AWS_REGION_US_WEST_2 && r != AWS_REGION_US_GOV_WEST_1 &&
-		r != AWS_REGION_EU_WEST_1 && r != AWS_REGION_EU_CENTRAL_1 &&
-		r != AWS_REGION_AP_SOUTHEAST_1 && r != AWS_REGION_AP_SOUTHEAST_2 && r != AWS_REGION_AP_NORTHEAST_1 &&
-		r != AWS_REGION_SA_EAST_1 {
-		return ErrAWSRegionInvalid
 	}
 
 	return nil

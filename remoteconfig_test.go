@@ -203,7 +203,7 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorSQSQueueConfigV
 	}
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Sub Field of SQSQueue, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
+	assert.Equal(s.T(), errors.New("Sub Field of SQSQueue, failed to validate with error, Field: AWSAccountID, not set"), err)
 }
 
 func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBTableConfigNotSet() {
@@ -292,7 +292,7 @@ func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBClientC
 
 	err := validateConfigWithReflection(c)
 	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Sub Field of DynamoDBClient, failed to validate with error, Validater Field: Region, failed to validate with error, Region is invalid"), err)
+	assert.Equal(s.T(), errors.New("String Field: Str, contains an empty string"), err)
 }
 
 func (s *RemoteConfigSuite) TestValidateConfigWithReflectionErrorDynamoDBTableConfigValidate() {

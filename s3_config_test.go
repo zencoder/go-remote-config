@@ -111,20 +111,6 @@ func (s *S3ConfigSuite) TestValidateErrorRegionNotSet() {
 	s.Equal(errors.New("Field: Region, not set"), err)
 }
 
-func (s *S3ConfigSuite) TestValidateErrorRegionInvalid() {
-	bucket := VALID_S3_CONFIG_BUCKET
-	region := AWSRegion("invalidregion")
-
-	c := &S3Config{
-		Bucket: &bucket,
-		Region: &region,
-	}
-
-	err := validateConfigWithReflection(c)
-	s.NotNil(err)
-	s.Equal(errors.New("Validater Field: Region, failed to validate with error, Region is invalid"), err)
-}
-
 func (s *S3ConfigSuite) TestGetEndpointNotSet() {
 	bucket := VALID_S3_CONFIG_BUCKET
 	region := VALID_S3_CONFIG_REGION

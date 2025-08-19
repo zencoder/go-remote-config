@@ -34,13 +34,6 @@ func (s *AWSRegionSuite) TestValidateErrorNoRegion() {
 	assert.Equal(s.T(), ErrAWSRegionEmptyString, err)
 }
 
-func (s *AWSRegionSuite) TestValidateErrorInvalidRegion() {
-	r := AWSRegion("invalidregion")
-	err := r.Validate()
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrAWSRegionInvalid, err)
-}
-
 func (s *AWSRegionSuite) TestUnmarshalText() {
 	r := AWSRegion("")
 	d := []byte(AWS_REGION_US_EAST_1)
@@ -55,12 +48,4 @@ func (s *AWSRegionSuite) TestUnmarshalErrorNoRegion() {
 	err := r.UnmarshalText(d)
 	assert.NotNil(s.T(), err)
 	assert.Equal(s.T(), ErrAWSRegionEmptyString, err)
-}
-
-func (s *AWSRegionSuite) TestUnmarshalErrorInvalidRegion() {
-	r := AWSRegion("")
-	d := []byte("invalidregion")
-	err := r.UnmarshalText(d)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), ErrAWSRegionInvalid, err)
 }
