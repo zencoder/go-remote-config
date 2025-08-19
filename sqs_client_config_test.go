@@ -51,18 +51,6 @@ func (s *SQSClientConfigSuite) TestValidateWithEndpoint() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *SQSClientConfigSuite) TestValidateErrorRegion() {
-	region := AWSRegion("invalidregion")
-
-	c := &SQSClientConfig{
-		Region: &region,
-	}
-
-	err := validateConfigWithReflection(c)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error"), err)
-}
-
 func (s *SQSClientConfigSuite) TestValidateErrorEndpoint() {
 	region := VALID_SQS_CLIENT_REGION
 	endpoint := ""

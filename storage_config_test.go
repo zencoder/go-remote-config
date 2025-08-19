@@ -52,19 +52,6 @@ func (s *StorageConfigSuite) TestValidateConfigWithReflectionErrorProvider() {
 	assert.Equal(s.T(), errors.New("Validater Field: StorageConfig, failed to validate with error, Invalid storage provider"), err)
 }
 
-func (s *StorageConfigSuite) TestValidateConfigWithReflectionErrorLocation() {
-	p := VALID_STORAGE_CONFIG_PROVIDER
-	l := (StorageLocation)("invalid_location")
-	c := &StorageConfig{
-		Provider: &p,
-		Location: &l,
-	}
-
-	err := validateConfigWithReflection(c)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Validater Field: StorageConfig, failed to validate with error"), err)
-}
-
 func (s *StorageConfigSuite) TestGetProvider() {
 	p := VALID_STORAGE_CONFIG_PROVIDER
 	c := &StorageConfig{

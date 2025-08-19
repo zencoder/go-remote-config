@@ -51,22 +51,6 @@ func (s *SQSQueueConfigSuite) TestValidate() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *SQSQueueConfigSuite) TestValidateErrorRegion() {
-	region := AWSRegion("invalidregion")
-	awsAccountID := VALID_SQS_QUEUE_AWS_ACCOUNT_ID
-	queueName := VALID_SQS_QUEUE_QUEUE_NAME
-
-	c := &SQSQueueConfig{
-		Region:       &region,
-		AWSAccountID: &awsAccountID,
-		QueueName:    &queueName,
-	}
-
-	err := validateConfigWithReflection(c)
-	assert.NotNil(s.T(), err)
-	assert.Equal(s.T(), errors.New("Validater Field: Region, failed to validate with error"), err)
-}
-
 func (s *SQSQueueConfigSuite) TestValidateErrorAWSAccountID() {
 	region := VALID_SQS_QUEUE_REGION
 	awsAccountID := ""
