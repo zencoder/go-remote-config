@@ -1,4 +1,4 @@
-module github.com/zencoder/go-remote-config
+module github.com/brightcove/playback_go-remote-config
 
 go 1.13
 
